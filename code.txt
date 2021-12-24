@@ -1,0 +1,16 @@
+--This is a sample code in the TSLANG language
+function sum (Array a, Int b, Int c) returns Int:
+    val Int s;
+    s = b + c;
+    if (s >= 2):
+--matin rezania 
+        foreach (i of a):
+            s = s*i;
+        end
+    else
+        s = 0;
+    end
+    --This is a sample code in the TSLANG language
+
+    return s;
+end
