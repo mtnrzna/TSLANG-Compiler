@@ -137,14 +137,8 @@ def p_prog(p):
     print('rule 0 reduced')
 
 
-#def p_x(p):
-#    '''x :
-#        | prog'''
-
-
 def p_func(p):
-    '''func : FUNCTION ID LPARANT flist RPARANT RETURNS type COLON body END
-            | '''
+    '''func : FUNCTION ID LPARANT flist RPARANT RETURNS type COLON body END'''
     print('rule 1 reduced')
 
 
@@ -162,12 +156,13 @@ def p_stmt(p):
             | WHILE LPARANT expr RPARANT DO stmt
             | FOREACH LPARANT ID OF expr RPARANT stmt
             | RETURN expr SEMICOLON
-            | body END'''
+            | COLON body END'''
     print('rule 3 reduced')
 
 
 def p_defvar(p):
     '''defvar : VAL type ID'''
+    print('rule 4 reduced')
 
 
 def p_expr(p):
@@ -194,18 +189,22 @@ def p_expr(p):
             | LPARANT expr RPARANT
             | ID
             | NUMBER'''
+    print('rule 5 reduced')
 
 
 def p_flist(p):
     '''flist :
             | type ID
             | type ID COMMA flist'''
+    print('rule 6 reduced')
 
 
 def p_clist(p):
     '''clist :
             | expr
             | expr COMMA clist'''
+    print('rule 7 reduced')
+
 
 def p_type(p):
     '''type : INT
@@ -220,15 +219,19 @@ def p_type(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    print("Syntax error in input!")
-
+    if p:
+        print("Syntax error at token", p.type)
+        # Just discard the token and tell the parser it's okay.
+        parser.errok()
+    else:
+        print("Syntax error at EOF")
 
 #Set up precedence
 precedence = (
     ('left', 'AMP_AMP', 'EXCL_MARK', 'PIPE_PIPE', 'SMALL_EQUAL', 'BIG_EQUAL', 'EXCL_EQUAL', 'EQUAL_EQUAL', 'SMALL', 'BIG'),
     ('left', 'EQUAL', 'QUEST_MARK', 'COLON'),
     ('left', 'PLUS', 'MINUS'),
-    ('left', 'MULTIPLY', 'DIVIDE'),
+    ('left', 'MULTIPLY', 'DIVIDE', 'PERCENT'),
     ('left', 'LPARANT', 'RPARANT', 'LBRACKET', 'RBRACKET')
 )
 # Build the parser
