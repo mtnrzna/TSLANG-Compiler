@@ -1,21 +1,27 @@
 from compiler_levels.lexer.tokens import *
-
+from utils.AST import tree, add_childs, create_node
 
 def p_prog(p):
     '''prog : func
             | func prog'''
     print('rule 0 reduced')
+    p[0] = create_node("prog")
+    add_childs(p)
 
 
 def p_func(p):
     '''func : FUNCTION ID LPARANT flist RPARANT RETURNS type COLON body END'''
     print('rule 1 reduced')
+    p[0] = create_node("func")
+    add_childs(p)
 
 
 def p_body(p):
     '''body : stmt
             | stmt body'''
     print('rule 2 reduced')
+    p[0] = create_node("body")
+    add_childs(p)
 
 
 def p_stmt(p):
@@ -28,11 +34,16 @@ def p_stmt(p):
             | RETURN expr SEMICOLON
             | COLON body END'''
     print('rule 3 reduced')
+    p[0] = create_node("stmt")
+    add_childs(p)
 
 
 def p_defvar(p):
     '''defvar : VAL type ID'''
     print('rule 4 reduced')
+    p[0] = create_node("defvar")
+    add_childs(p)
+
 
 
 def p_expr(p):
@@ -60,6 +71,8 @@ def p_expr(p):
             | ID
             | NUMBER'''
     print('rule 5 reduced')
+    p[0] = create_node("expr")
+    add_childs(p)
 
 
 def p_flist(p):
@@ -67,6 +80,8 @@ def p_flist(p):
             | type ID
             | type ID COMMA flist'''
     print('rule 6 reduced')
+    p[0] = create_node("flist")
+    add_childs(p)
 
 
 def p_clist(p):
@@ -74,12 +89,17 @@ def p_clist(p):
             | expr
             | expr COMMA clist'''
     print('rule 7 reduced')
+    p[0] = create_node("clist")
+    add_childs(p)
 
 
 def p_type(p):
     '''type : INT
             | ARRAY
             | NIL'''
+    print(p[1])
+    p[0] = create_node("type")
+    add_childs(p)
 
 
 #def p_empty(p):
@@ -92,7 +112,7 @@ def p_error(p):
     if p:
         print("Syntax error at token", p.type)
         # Just discard the token and tell the parser it's okay.
-        parser.errok()
+        #parser.errok()
     else:
         print("Syntax error at EOF")
 
