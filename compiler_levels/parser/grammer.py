@@ -1,27 +1,38 @@
+import config
 from compiler_levels.lexer.tokens import *
-from utils.AST import tree, add_childs, create_node
+from utils.abstract_tree import create_node
+from utils.show_tree import show_tree
+from utils.symbol_table import SymbolTable
+
 
 def p_prog(p):
     '''prog : func
             | func prog'''
-    print('rule 0 reduced')
-    p[0] = create_node("prog")
-    add_childs(p)
+    print(f"rule 0 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "prog"
+    p[0] = create_node(p)
+    config.syntax_tree = p[0]
 
 
 def p_func(p):
     '''func : FUNCTION ID LPARANT flist RPARANT RETURNS type COLON body END'''
-    print('rule 1 reduced')
-    p[0] = create_node("func")
-    add_childs(p)
+    print(f"rule 1 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "func"
+    p[0] = create_node(p)
 
 
 def p_body(p):
     '''body : stmt
             | stmt body'''
-    print('rule 2 reduced')
-    p[0] = create_node("body")
-    add_childs(p)
+    print(f"rule 2 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "body"
+    p[0] = create_node(p)
 
 
 def p_stmt(p):
@@ -33,16 +44,20 @@ def p_stmt(p):
             | FOREACH LPARANT ID OF expr RPARANT stmt
             | RETURN expr SEMICOLON
             | COLON body END'''
-    print('rule 3 reduced')
-    p[0] = create_node("stmt")
-    add_childs(p)
+    print(f"rule 3 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "stmt"
+    p[0] = create_node(p)
 
 
 def p_defvar(p):
     '''defvar : VAL type ID'''
-    print('rule 4 reduced')
-    p[0] = create_node("defvar")
-    add_childs(p)
+    print(f"rule 4 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "defva"
+    p[0] = create_node(p)
 
 
 
@@ -70,36 +85,48 @@ def p_expr(p):
             | LPARANT expr RPARANT
             | ID
             | NUMBER'''
-    print('rule 5 reduced')
-    p[0] = create_node("expr")
-    add_childs(p)
+    print(f"rule 5 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "expr"
+    p[0] = create_node(p)
 
 
 def p_flist(p):
     '''flist :
             | type ID
             | type ID COMMA flist'''
-    print('rule 6 reduced')
-    p[0] = create_node("flist")
-    add_childs(p)
+    print(f"rule 6 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "flist"
+    p[0] = create_node(p)
 
 
 def p_clist(p):
     '''clist :
             | expr
             | expr COMMA clist'''
-    print('rule 7 reduced')
-    p[0] = create_node("clist")
-    add_childs(p)
+    print(f"rule 7 reduced, line number: {p.lineno(1)}")
+    
+    #syntax tree
+    p[0] = "clist"
+    p[0] = create_node(p)
 
 
 def p_type(p):
     '''type : INT
             | ARRAY
             | NIL'''
-    print(p[1])
-    p[0] = create_node("type")
-    add_childs(p)
+    print(f"rule 8 reduced, line number: {p.lineno(1)}")
+
+    #syntax tree
+    p[0] = "type"
+    p[0] = create_node(p)
+
+    #symbol tree
+
+
 
 
 #def p_empty(p):
@@ -110,7 +137,7 @@ def p_type(p):
 # Error rule for syntax errors
 def p_error(p):
     if p:
-        print("Syntax error at token", p.type)
+        print("Syntax error at token", p.type, p.lineno)
         # Just discard the token and tell the parser it's okay.
         #parser.errok()
     else:
