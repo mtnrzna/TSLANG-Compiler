@@ -1,3 +1,4 @@
-from compile import compile
+from compile import Compiler
 
-compile("code.txt")
+compiler = Compiler()
+compiler.compile("code.txt")
