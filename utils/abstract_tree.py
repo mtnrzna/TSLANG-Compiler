@@ -17,11 +17,16 @@ def create_node(p):
     for i in range(len(list(p))):
         if i == 0:
             continue
-        if type(p[i]).__name__ == SyntaxTreeNode.__name__:
-            children.append(p[i])
-        else:
-            p[i] = create_node([p[i]])
-            children.append(p[i])
+        try:
+            children.append(p[i]["st"])
+        except:
+            name = p[i]
+            node = create_node([p[i]])
+            p[i] = {
+                "name":name,
+                "st": node,
+            }
+            children.append(p[i]["st"])
 
     node = SyntaxTreeNode(p[0], id, children=children)
     return node

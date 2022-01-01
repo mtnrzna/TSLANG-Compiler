@@ -9,30 +9,36 @@ def p_prog(p):
     '''prog : func
             | func prog'''
     print(f"rule 0 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "prog"
-    p[0] = create_node(p)
-    config.syntax_tree = p[0]
+    p[0] = {
+        "name":"prog",
+        "st": create_node(p)
+    }
+
+    config.syntax_tree = p[0]["st"]
 
 
 def p_func(p):
     '''func : FUNCTION ID LPARANT flist RPARANT RETURNS type COLON body END'''
     print(f"rule 1 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "func"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"func",
+        "st": create_node(p)
+    }
+    
 
 
 def p_body(p):
     '''body : stmt
             | stmt body'''
     print(f"rule 2 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "body"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"body",
+        "st": create_node(p)
+    }
+
 
 
 def p_stmt(p):
@@ -45,19 +51,23 @@ def p_stmt(p):
             | RETURN expr SEMICOLON
             | COLON body END'''
     print(f"rule 3 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "stmt"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"stmt",
+        "st": create_node(p)
+    }
+
 
 
 def p_defvar(p):
     '''defvar : VAL type ID'''
     print(f"rule 4 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
-    p[0] = "defva"
-    p[0] = create_node(p)
+    p[0] = "defvar"
+    p[0] = {
+        "name":"defvar",
+        "st": create_node(p)
+    }
+
 
 
 
@@ -86,10 +96,12 @@ def p_expr(p):
             | ID
             | NUMBER'''
     print(f"rule 5 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "expr"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"expr",
+        "st": create_node(p)
+    }
+
 
 
 def p_flist(p):
@@ -97,10 +109,12 @@ def p_flist(p):
             | type ID
             | type ID COMMA flist'''
     print(f"rule 6 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "flist"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"flist",
+        "st": create_node(p)
+    }
+
 
 
 def p_clist(p):
@@ -108,10 +122,11 @@ def p_clist(p):
             | expr
             | expr COMMA clist'''
     print(f"rule 7 reduced, line number: {p.lineno(1)}")
-    
-    #syntax tree
     p[0] = "clist"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"clist",
+        "st": create_node(p)
+    }
 
 
 def p_type(p):
@@ -119,10 +134,12 @@ def p_type(p):
             | ARRAY
             | NIL'''
     print(f"rule 8 reduced, line number: {p.lineno(1)}")
-
-    #syntax tree
     p[0] = "type"
-    p[0] = create_node(p)
+    p[0] = {
+        "name":"type",
+        "st": create_node(p)
+    }
+
 
     #symbol tree
 
