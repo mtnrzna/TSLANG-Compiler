@@ -3,10 +3,9 @@ import uuid
 
 
 class SyntaxTreeNode(NodeMixin):  
-    def __init__(self, name, id, parent=None, children=None):
+    def __init__(self, name, id, children=None):
         self.name = name
         self.id = id
-        self.parent = parent
         if children:
             self.children = children
 
