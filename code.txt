@@ -1,10 +1,14 @@
-function find(Array A , Int x) returns Int:
+function find(Array A , Int x jj) returns Int:
     val Int n;
     i =0;
     foreach(n of A):
-        if(n<=k):
-            return i;
-        end
+        if(n<=k)
+             i;
+        --else
+          --   i;
+        
+         5 ? 5 ; 
+        
         i = i +1;
     end
     return -1;

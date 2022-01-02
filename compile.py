@@ -14,9 +14,17 @@ class Compiler(object):
 
     def compile(self, file_address):
         data = read_from_file(file_address)
-        self.lexer.build(data)
+        #self.lexer.build(data)
         self.parser.build(data)
-        show_tree(config.syntax_tree)
+        try: 
+            show_tree(config.syntax_tree)
+        except:
+            print("Compiled failed with error/errors")
+
+        if Tokens.errors != 0:
+            print(f"{Tokens.errors} lexer errors detected")
+        if Grammar.errors != 0:
+            print(f"{Grammar.errors} parser errors detected")
 
 
 

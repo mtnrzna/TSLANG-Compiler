@@ -5,7 +5,7 @@ class Lexer(object):
     def __init__(self, tokens):
         self.lexer = lex.lex(object=tokens)
 
-    def build(self, data):
+    '''def build(self, data):
         self.lexer.input(data)
         for tok in self.lexer:
-            print(tok.value, tok.type)
+            print(tok.value, tok.type)'''

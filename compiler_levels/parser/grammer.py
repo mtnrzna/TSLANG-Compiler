@@ -9,6 +9,7 @@ class Grammar(object):
     
     tokens = Tokens.tokens
         
+    errors = 0
    
     #  prog rules
     def p_prog1(p):
@@ -20,7 +21,7 @@ class Grammar(object):
             "ast" : Prog1(p[1]["ast"]) # ast: abstract syntax tree
         }
         config.syntax_tree = p[0]["st"]
-        
+
 
 
     def p_prog2(p):
@@ -31,6 +32,7 @@ class Grammar(object):
             "st": SyntaxTreeUtil.create_node(p), # st: syntax tree
             "ast" : Prog2(p[1]["ast"], p[2]["ast"]) # ast: abstract syntax tree
         }
+        config.syntax_tree = p[0]["st"]
 
 
    
@@ -42,6 +44,17 @@ class Grammar(object):
             "name":"func",
             "st": SyntaxTreeUtil.create_node(p),
             "ast" : Func1(p[2]["ast"], p[4]["ast"], p[7]["ast"], p[9]["ast"])
+        }
+
+    def p_func1_error(p): # For errors in the paranthesis
+        '''func : FUNCTION iden LPARANT error RPARANT RETURNS type COLON body END'''
+        print(f"{p[4].lineno}: Error corrected. The syntax is 'function iden ( flist ) returns type: body end'")
+        p[4] = p[4].value
+        p[0] = "func"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast" : Func1(p[2]["ast"], p[4], p[7]["ast"], p[9]["ast"])
         }
 
 
@@ -107,15 +120,37 @@ class Grammar(object):
         }
 
 
+    def p_stmt3_error(p): # For errors in the paranthesis
+        '''stmt : IF LPARANT error RPARANT stmt'''
+        print(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt'")
+        p[3] = p[3].value
+        p[0] = "stmt"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Stmt3(p[3], p[5]["ast"])
+        }
+
     def p_stmt4(p):
         '''stmt : IF LPARANT expr RPARANT stmt ELSE stmt'''
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt3(p[3]["ast"], p[5]["ast"], p[7]["ast"])
+            "ast": Stmt4(p[3]["ast"], p[5]["ast"], p[7]["ast"])
         }
 
+
+    def p_stmt4_error(p): # For errors in the paranthesis
+        '''stmt : IF LPARANT error RPARANT stmt ELSE stmt'''
+        print(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt else stmt'")
+        p[3] = p[3].value
+        p[0] = "stmt"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Stmt4(p[3], p[5]["ast"], p[7]["ast"])
+        }
 
     def p_stmt5(p):
         '''stmt : WHILE LPARANT expr RPARANT DO stmt'''
@@ -124,6 +159,18 @@ class Grammar(object):
             "name":"stmt",
             "st": SyntaxTreeUtil.create_node(p), 
             "ast": Stmt5(p[3]["ast"], p[6]["ast"])
+        }
+
+
+    def p_stmt5_error(p): # For errors in the paranthesis
+        '''stmt : WHILE LPARANT error RPARANT DO stmt'''
+        print(f"{p[3].lineno}: Error corrected. The syntax is 'while ( expr ) do stmt'")
+        p[3] = p[3].value
+        p[0] = "stmt"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Stmt5(p[3], p[6]["ast"])
         }
 
 
@@ -181,6 +228,17 @@ class Grammar(object):
         }
 
 
+    def p_expr1_error(p): # For errors in the paranthesis
+        '''expr : iden LPARANT error RPARANT'''
+        print(f"{p[3].lineno}: Error corrected. The syntax is 'iden ( clist )'")
+        p[3] = p[3].value
+        p[0] = "expr"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Expr1(p[1]["ast"], p[3])
+        }
+
     def p_expr2(p):
         '''expr : expr LBRACKET expr RBRACKET'''
         p[0] = "expr"
@@ -191,8 +249,32 @@ class Grammar(object):
         }
 
 
+    def p_expr2_error(p): # For errors in the brackets
+        '''expr : expr LBRACKET error RBRACKET'''
+        print(f"{p[3].lineno}: Error corrected. The syntax is 'expr [ expr ]'")
+        p[3] = p[3].value
+        p[0] = "expr"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Expr1(p[1]["ast"], p[3])
+        }
+
+
     def p_expr3(p):
         '''expr : expr QUEST_MARK expr COLON expr'''
+        p[0] = "expr"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Expr3(p[1]["ast"], p[3]["ast"], p[5]["ast"])
+        }
+
+
+    def p_expr3_error(p): # For errors when you put "";" instead of ":"
+        '''expr : expr QUEST_MARK expr error expr'''
+        print(f"{p[4].lineno}: Error corrected. The syntax is 'expr ? expr : expr'")
+        p[4] = p[4].value
         p[0] = "expr"
         p[0] = {
             "name":"expr",
@@ -243,6 +325,17 @@ class Grammar(object):
             "name":"expr",
             "st": SyntaxTreeUtil.create_node(p),
             "ast": Expr6(p[2]["ast"])
+        }
+
+    def p_expr6_error(p):
+        '''expr : LPARANT error RPARANT'''
+        print(f"{p[2].lineno}: Error corrected. The syntax is '( expr )'")
+        p[2] = p[2].value
+        p[0] = "expr"
+        p[0] = {
+            "name":"expr",
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Expr6(p[2])
         }
 
 
@@ -296,6 +389,7 @@ class Grammar(object):
             "st": SyntaxTreeUtil.create_node(p),
             "ast": Flist3(p[1]["ast"], p[2]["ast"], p[4]["ast"])
         }
+
 
 
     # clist rules
@@ -377,7 +471,8 @@ class Grammar(object):
     # Error rule for syntax errors
     def p_error(p):
         if p:
-            print(f"Syntax error at line {p.lineno}, column : LexToken({p.type}, {p.value}")
+            print(f"{p.lineno}: Syntax error at token: {p.value} ")
+            Grammar.errors += 1
             # Just discard the token and tell the parser it's okay.
             #parser.errok()
         else:
@@ -385,6 +480,7 @@ class Grammar(object):
 
     #Set up precedence
     precedence = (
+        ('left', 'error'),
         ('left', 'AMP_AMP', 'EXCL_MARK', 'PIPE_PIPE', 'SMALL_EQUAL', 'BIG_EQUAL', 'EXCL_EQUAL', 'EQUAL_EQUAL', 'SMALL', 'BIG'),
         ('left', 'EQUAL', 'QUEST_MARK', 'COLON'),
         ('left', 'PLUS', 'MINUS'),
