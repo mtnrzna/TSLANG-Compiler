@@ -3,7 +3,7 @@ from compiler_levels.lexer.tokens import Tokens
 
 class Lexer(object):
     def __init__(self, tokens):
-        self.lexer = lex.lex(object=tokens)
+        self.lexer = lex.lex(object=tokens)        
 
     '''def build(self, data):
         self.lexer.input(data)

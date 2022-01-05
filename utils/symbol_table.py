@@ -6,11 +6,17 @@ class Symbol:
 class VariableSymbol(Symbol):
     pass
 
-class FunctionSymbol(Symbol):
-    def __init__(self, name, type, arguments):
+class ArraySymbol(Symbol):
+    def __init__(self, name, type, size):
         self.name = name
         self.type = type
-        self.arguments = arguments
+        self.size = size
+
+class FunctionSymbol(Symbol):
+    def __init__(self, name, type, parameters):
+        self.name = name
+        self.type = type
+        self.parameters = parameters
 
 class SymbolTable(object):
 
@@ -19,17 +25,17 @@ class SymbolTable(object):
         self.name = name
         self.parent = parent
 
-    def put(self, symbol): # put variable symbol or fundef under <name> entry
+    def put(self, symbol):  # get variable or function from symbol table
         if self.symbols.__contains__(symbol.name):
             return False
         else:
             self.symbols[symbol.name]= symbol
             return True
 
-    def get(self, name): # get variable symbol or fundef from <name> entry
+    def get(self, name, check_parent=True): # get the variable or function id
         if self.symbols.__contains__(name):
             return self.symbols[name]
-        elif self.parent:
+        elif check_parent and self.parent:
             return self.parent.get(name)
         else:
             return None

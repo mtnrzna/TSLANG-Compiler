@@ -9,7 +9,13 @@ class Grammar(object):
     
     tokens = Tokens.tokens
         
+    lexer = []
     errors = 0
+    error_messages = []
+    @staticmethod
+    def print_error_messages():
+        for message in Grammar.error_messages:
+            print(message)
    
     #  prog rules
     def p_prog1(p):
@@ -17,56 +23,51 @@ class Grammar(object):
         p[0] = "prog"
         p[0] = {
             "name":"prog",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), # st: syntax tree
-            "ast" : Prog1(p[1]["ast"]) # ast: abstract syntax tree
+            "ast" : Prog1(p[1]["ast"], Grammar.lexer.lineno) # ast: abstract syntax tre, Grammar.lexer.linenoe
         }
         config.syntax_tree = p[0]["st"]
-
-
+        config.ast = p[0]["ast"]
+        
 
     def p_prog2(p):
         '''prog : func prog'''
         p[0] = "prog"
         p[0] = {
             "name":"prog",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), # st: syntax tree
-            "ast" : Prog2(p[1]["ast"], p[2]["ast"]) # ast: abstract syntax tree
+            "ast" : Prog2(p[1]["ast"], p[2]["ast"], Grammar.lexer.lineno) # ast: abstract syntax tre, Grammar.lexer.linenoe
         }
         config.syntax_tree = p[0]["st"]
+        config.ast = p[0]["ast"]
+
 
 
    
     #  func rules
-    def p_func1(p):
+    def p_func(p):
         '''func : FUNCTION iden LPARANT flist RPARANT RETURNS type COLON body END'''
         p[0] = "func"
         p[0] = {
             "name":"func",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast" : Func1(p[2]["ast"], p[4]["ast"], p[7]["ast"], p[9]["ast"])
+            "ast" : Func(p[2]["ast"], p[4]["ast"], p[7]["ast"], p[9]["ast"], Grammar.lexer.lineno)
         }
 
-    def p_func1_error(p): # For errors in the paranthesis
+    def p_func_error(p): # For errors in the paranthesis
         '''func : FUNCTION iden LPARANT error RPARANT RETURNS type COLON body END'''
-        print(f"{p[4].lineno}: Error corrected. The syntax is 'function iden ( flist ) returns type: body end'")
+        Grammar.error_messages.append(f"{p[4].lineno}: Error corrected. The syntax is 'function iden ( flist ) returns type: body end'")
         p[4] = p[4].value
         p[0] = "func"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast" : Func1(p[2]["ast"], p[4], p[7]["ast"], p[9]["ast"])
+            "ast" : Func(p[2]["ast"], p[4], p[7]["ast"], p[9]["ast"], Grammar.lexer.lineno)
         }
-
-
-    def p_func2(p):
-        '''func : empty'''
-        p[0] = "func"
-        p[0] = {
-            "name":"func",
-            "st": SyntaxTreeUtil.create_node(p),
-            "ast" : Empty()
-        }
-        
 
 
     def p_body1(p):
@@ -74,8 +75,9 @@ class Grammar(object):
         p[0] = "body"
         p[0] = {
             "name":"body",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Body1(p[1]["ast"])
+            "ast": Body1(p[1]["ast"], Grammar.lexer.lineno)
         }
 
     
@@ -84,8 +86,9 @@ class Grammar(object):
         p[0] = "body"
         p[0] = {
             "name":"body",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Body2(p[1]["ast"], p[2]["ast"])
+            "ast": Body2(p[1]["ast"], p[2]["ast"], Grammar.lexer.lineno)
         }
 
    
@@ -95,8 +98,9 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt1(p[1]["ast"])
+            "ast": Stmt1(p[1]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -105,8 +109,9 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt2(p[1]["ast"])
+            "ast": Stmt2(p[1]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -115,20 +120,22 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt3(p[3]["ast"], p[5]["ast"])
+            "ast": Stmt3(p[3]["ast"], p[5]["ast"], Grammar.lexer.lineno)
         }
 
 
     def p_stmt3_error(p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt'''
-        print(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt'")
+        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt'")
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt3(p[3], p[5]["ast"])
+            "ast": Stmt3(p[3], p[5]["ast"], Grammar.lexer.lineno)
         }
 
     def p_stmt4(p):
@@ -136,20 +143,22 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt4(p[3]["ast"], p[5]["ast"], p[7]["ast"])
+            "ast": Stmt4(p[3]["ast"], p[5]["ast"], p[7]["ast"], Grammar.lexer.lineno)
         }
 
 
     def p_stmt4_error(p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt ELSE stmt'''
-        print(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt else stmt'")
+        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt else stmt'")
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt4(p[3], p[5]["ast"], p[7]["ast"])
+            "ast": Stmt4(p[3], p[5]["ast"], p[7]["ast"], Grammar.lexer.lineno)
         }
 
     def p_stmt5(p):
@@ -157,20 +166,22 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Stmt5(p[3]["ast"], p[6]["ast"])
+            "ast": Stmt5(p[3]["ast"], p[6]["ast"], Grammar.lexer.lineno)
         }
 
 
     def p_stmt5_error(p): # For errors in the paranthesis
         '''stmt : WHILE LPARANT error RPARANT DO stmt'''
-        print(f"{p[3].lineno}: Error corrected. The syntax is 'while ( expr ) do stmt'")
+        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'while ( expr ) do stmt'")
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt5(p[3], p[6]["ast"])
+            "ast": Stmt5(p[3], p[6]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -179,8 +190,9 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Stmt6(p[3]["ast"], p[5]["ast"], p[7]["ast"])
+            "ast": Stmt6(p[3]["ast"], p[5]["ast"], p[7]["ast"], Grammar.lexer.lineno)
         }
 
     
@@ -189,8 +201,9 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt7(p[2]["ast"])
+            "ast": Stmt7(p[2]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -199,8 +212,9 @@ class Grammar(object):
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt8(p[2]["ast"])
+            "ast": Stmt8(p[2]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -211,8 +225,9 @@ class Grammar(object):
         p[0] = "defvar"
         p[0] = {
             "name":"defvar",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Defvar(p[2]["ast"], p[3]["ast"])
+            "ast": Defvar(p[2]["ast"], p[3]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -223,20 +238,22 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Expr1(p[1]["ast"], p[3]["ast"])
+            "ast": Expr1(p[1]["ast"], p[3]["ast"], Grammar.lexer.lineno)
         }
 
 
     def p_expr1_error(p): # For errors in the paranthesis
         '''expr : iden LPARANT error RPARANT'''
-        print(f"{p[3].lineno}: Error corrected. The syntax is 'iden ( clist )'")
+        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'iden ( clist )'")
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr1(p[1]["ast"], p[3])
+            "ast": Expr1(p[1]["ast"], p[3], Grammar.lexer.lineno)
         }
 
     def p_expr2(p):
@@ -244,20 +261,22 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Expr2(p[1]["ast"], p[3]["ast"])
+            "ast": Expr2(p[1]["ast"], p[3]["ast"], Grammar.lexer.lineno)
         }
 
 
     def p_expr2_error(p): # For errors in the brackets
         '''expr : expr LBRACKET error RBRACKET'''
-        print(f"{p[3].lineno}: Error corrected. The syntax is 'expr [ expr ]'")
+        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'expr [ expr ]'")
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr1(p[1]["ast"], p[3])
+            "ast": Expr1(p[1]["ast"], p[3], Grammar.lexer.lineno)
         }
 
 
@@ -266,20 +285,22 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr3(p[1]["ast"], p[3]["ast"], p[5]["ast"])
+            "ast": Expr3(p[1]["ast"], p[3]["ast"], p[5]["ast"], Grammar.lexer.lineno)
         }
 
 
     def p_expr3_error(p): # For errors when you put "";" instead of ":"
         '''expr : expr QUEST_MARK expr error expr'''
-        print(f"{p[4].lineno}: Error corrected. The syntax is 'expr ? expr : expr'")
+        Grammar.error_messages.append(f"{p[4].lineno}: Error corrected. The syntax is 'expr ? expr : expr'")
         p[4] = p[4].value
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr3(p[1]["ast"], p[3]["ast"], p[5]["ast"])
+            "ast": Expr3(p[1]["ast"], p[3]["ast"], p[5]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -301,8 +322,9 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Expr4(p[1]["ast"], p[2], p[3]["ast"])
+            "ast": Expr4(p[1]["ast"], p[2], p[3]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -313,8 +335,9 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Expr5(p[1], p[2]["ast"])
+            "ast": Expr5(p[1], p[2]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -323,19 +346,21 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr6(p[2]["ast"])
+            "ast": Expr6(p[2]["ast"], Grammar.lexer.lineno)
         }
 
     def p_expr6_error(p):
         '''expr : LPARANT error RPARANT'''
-        print(f"{p[2].lineno}: Error corrected. The syntax is '( expr )'")
+        Grammar.error_messages.append(f"{p[2].lineno}: Error corrected. The syntax is '( expr )'")
         p[2] = p[2].value
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr6(p[2])
+            "ast": Expr6(p[2], Grammar.lexer.lineno)
         }
 
 
@@ -344,8 +369,9 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Expr7(p[1]["ast"])
+            "ast": Expr7(p[1]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -354,8 +380,9 @@ class Grammar(object):
         p[0] = "expr"
         p[0] = {
             "name":"expr",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Expr8(p[1]["ast"])
+            "ast": Expr8(p[1]["ast"], Grammar.lexer.lineno)
         }
 
     
@@ -366,8 +393,9 @@ class Grammar(object):
         p[0] = "flist"
         p[0] = {
             "name":"flist",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Empty()
+            "ast": Empty(Grammar.lexer.lineno)
         }
 
 
@@ -376,8 +404,9 @@ class Grammar(object):
         p[0] = "flist"
         p[0] = {
             "name":"flist",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Flist2(p[1]["ast"], p[2]["ast"])
+            "ast": Flist2(p[1]["ast"], p[2]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -386,8 +415,9 @@ class Grammar(object):
         p[0] = "flist"
         p[0] = {
             "name":"flist",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Flist3(p[1]["ast"], p[2]["ast"], p[4]["ast"])
+            "ast": Flist3(p[1]["ast"], p[2]["ast"], p[4]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -398,8 +428,9 @@ class Grammar(object):
         p[0] = "clist"
         p[0] = {
             "name":"clist",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Empty()
+            "ast": Empty(Grammar.lexer.lineno)
         }
 
 
@@ -408,8 +439,9 @@ class Grammar(object):
         p[0] = "clist"
         p[0] = {
             "name":"clist",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Clist2(p[1]["ast"])
+            "ast": Clist2(p[1]["ast"], Grammar.lexer.lineno)
         }
 
 
@@ -418,8 +450,9 @@ class Grammar(object):
         p[0] = "clist"
         p[0] = {
             "name":"clist",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Clist3(p[1]["ast"], p[3]["ast"])
+            "ast": Clist3(p[1]["ast"], p[3]["ast"], Grammar.lexer.lineno)
         }
 
     
@@ -432,8 +465,9 @@ class Grammar(object):
         p[0] = "type"
         p[0] = {
             "name":"type",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Type(p[1])
+            "ast": Type(p[1], Grammar.lexer.lineno)
         }
 
 
@@ -444,8 +478,9 @@ class Grammar(object):
         p[0] = "number"
         p[0] = {
             "name":"number",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Num(p[1])
+            "ast": Num(p[1], Grammar.lexer.lineno)
         }
 
 
@@ -456,9 +491,12 @@ class Grammar(object):
         p[0] = "iden"
         p[0] = {
             "name":"iden",
+            "lineno": Grammar.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Iden(p[1])
+            "ast": Iden(p[1], Grammar.lexer.lineno)
         }
+        #print(f'token: \'{p[0]["name"]}\' at line: {p[0]["lineno"]}')
+
 
 
 
@@ -471,12 +509,12 @@ class Grammar(object):
     # Error rule for syntax errors
     def p_error(p):
         if p:
-            print(f"{p.lineno}: Syntax error at token: {p.value} ")
+            Grammar.error_messages.append(f"{p.lineno}: Syntax error at token: {p.value} ")
             Grammar.errors += 1
             # Just discard the token and tell the parser it's okay.
             #parser.errok()
         else:
-            print("Syntax error at EOF")
+            Grammar.error_messages.append("Syntax error at EOF")
 
     #Set up precedence
     precedence = (
