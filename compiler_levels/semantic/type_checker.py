@@ -235,7 +235,7 @@ class TypeChecker(NodeVisitor):
                 arg_type = arguments[i]
                 if par_type != arg_type:
                     # handle semantic error
-                    TypeChecker.add_error(f"{node.clist.lineno}: {i+1}th argument of function \'{function_iden}\' type should be {par_type}")
+                    TypeChecker.add_error(f"{node.clist.lineno}: {i+1}th argument of function '{function_iden}' type should be '{par_type}'")
                     return function_symbol.type
             # if number of arguments and their types where correct, return function iden's type
             return function_symbol.type
@@ -250,9 +250,10 @@ class TypeChecker(NodeVisitor):
             result = table.get(function_iden, check_parent=False)
             #if there is not a var with the same name in the same scope then it would make a function that returns "Nil" in the same scope
             if not result:
-                ##############################################FuncSSymbol
-                new_declared_func_for_error_handling = table.put(FunctionSymbol(function_iden, "Nil",[]))
-            
+                TypeChecker.add_error(f'{node.iden.lineno}: Function: \'{function_iden}\' not defined')
+                new_declared_func_for_error_handling = FunctionSymbol(function_iden, "Nil",[])
+                table.put(new_declared_func_for_error_handling)
+
             #if there is a var in the same scope with this name, return it's type
             else:
                 TypeChecker.add_error(f'{node.iden.lineno}: \'{function_iden}\' is not a function')
@@ -295,18 +296,26 @@ class TypeChecker(NodeVisitor):
         #print(f"visiting: expr4")
         first_operand = self.visit(node.expr, table)
         second_operand = self.visit(node.expr2, table)
-
         operator = node.oper["name"]
-        #if operator is "=", assignment and first operand is of type "Nil" you can assign anything to it
-        if operator == "=" and first_operand == "Nil":
+        #print(f'first operand type is {first_operand} and second is {second_operand} , operand: {operator}')
+
+
+        #check if it's like id = expr
+        first_operand_is_iden = isinstance(node.expr, AST.Expr7)
+
+        #dynamic type error handling! Nil type can be converted to Int or Array!
+        #if operator is "=", assignment and first operand is a iden of type "Nil" you can assign anything to it
+        if operator == "=" and first_operand == "Nil" and second_operand !="Nil" and first_operand_is_iden:
+            first_operand_name = node.expr.iden.iden_value["name"]
+            first_operand_symbol = table.get(first_operand_name)
+            first_operand_symbol.type = second_operand
             first_operand = second_operand
-            #print(f'first operand type is {node.expr} and second is {node.expr2}')
             return second_operand
 
         if first_operand != second_operand:
             TypeChecker.add_error(f'{node.expr.lineno}: Two sides of \'{operator}\' be of same type! expr1 is of type: \'{first_operand}\' and expr2 is of type: \'{second_operand}\' ')
             return "Nil"
-        print(f'first operand type is {node.expr} and second is {node.expr2}')
+        #print(f'first operand type is {first_operand} and second is {second_operand}')
         return first_operand
 
 
@@ -324,7 +333,7 @@ class TypeChecker(NodeVisitor):
     def visit_Expr7(self, node, table):
         #print(f"visiting: expr7")
         #search in table for the iden of this var, if not found, returns None
-        result =  self.visit(node.iden, table)
+        result = self.visit(node.iden, table)
         if not result:
             # for error handling we should create that var
             new_declared_symbol_for_error_handling = VariableSymbol(node.iden.iden_value["name"],"Nil")
@@ -334,7 +343,7 @@ class TypeChecker(NodeVisitor):
         
 
     def visit_Expr8(self, node, table):
-        #print(f"visiting: expr8")
+        #print(f"visiting: expr8")pr
         return self.visit(node.num, table)
 
 

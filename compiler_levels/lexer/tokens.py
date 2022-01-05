@@ -92,7 +92,7 @@ class Tokens(object):
 
     # Comment: defining a token rule that returns no value
     def t_COMMENT(self, t):
-        r"""--[^\n]*\n"""  # $ is for when the code ends with a comment
+        r"""--[^\n]*"""  # $ is for when the code ends with a comment
         pass
 
 

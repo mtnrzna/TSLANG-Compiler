@@ -13,37 +13,41 @@ class Compiler(object):
     lexer = Lexer(tokens)
     Grammar.lexer = lexer.lexer # lexer attribute in lexer object of Lexer class!
     parser = Parser(Grammar)
-
+    compiled_failed = False
     def compile(self, file_address):
         data = read_from_file(file_address)
         #self.lexer.build(data)
         self.parser.build(data)
         try:
-            print("Syntax Tree:")
             show_tree(config.syntax_tree)
-        except:
-            # when the input doesn't match the grammer and errors couldn't be handled
-            print("Compiled failed with error/errors")
-
-        if Tokens.errors != 0:
-            print(f"***{Tokens.errors} lexer errors detected***")
-            Tokens.print_error_messages()
-        else:
-            print(f"***Congrats! No lexer errors!***")
-        if Grammar.errors != 0:
-            print(f"***{Grammar.errors} parser errors detected***")
-            Grammar.print_error_messages()
-        else:
-            print(f"***Congrats! No parse errors!***")
 
 
-        try:
+            #lexer errors
+            if Tokens.errors != 0 and not Compiler.compiled_failed:
+                print(f"***{Tokens.errors} lexer errors detected***")
+                Tokens.print_error_messages()
+            elif Tokens.errors == 0 and not Compiler.compiled_failed:
+                print(f"***Congrats! No lexer errors!***")
+            
+            #parser errors
+            if Grammar.errors != 0 and not Compiler.compiled_failed:
+                print(f"***{Grammar.errors} parser errors detected***")
+                Grammar.print_error_messages()
+            elif Grammar.errors == 0 and not Compiler.compiled_failed:
+                print(f"***Congrats! No parser errors!***")
+
+            #semantic errors
             type_checker = TypeChecker()
             type_checker.visit(config.ast, None)
-            if TypeChecker.errors != 0:
+            if TypeChecker.errors != 0 and not Compiler.compiled_failed:
                 print(f"***{TypeChecker.errors} semantic errors detected***")
                 TypeChecker.print_error_messages()
-        except: 
-            pass
+            elif TypeChecker.errors == 0 and not Compiler.compiled_failed:
+                print(f"***Congrats! No semantic errors!***")
+    
+        except:
+            Compiler.compiled_failed = True
 
+        if Compiler.compiled_failed:
+            print("Compiled failed with unrecoverable error/errors")
 
