@@ -1,10 +1,18 @@
 class Tokens(object):
+
     errors = 0
     error_messages = []
     @staticmethod
     def print_error_messages():
         for message in Tokens.error_messages:
             print(message)
+    @staticmethod
+    def add_error(message):
+        if not message in Tokens.error_messages:
+            Tokens.error_messages.append(message)
+            Tokens.errors += 1 
+
+
     # List of token names.   This is always required
     reserved = {
         'function': 'FUNCTION',
@@ -108,6 +116,5 @@ class Tokens(object):
 
     # Error handling rule
     def t_error(self, t):
-        Tokens.error_messages.append("Illegal character '%s'" % t.value[0])
-        Tokens.errors += 1
+        Tokens.add_error(f"{t.lexer.lineno}: Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)

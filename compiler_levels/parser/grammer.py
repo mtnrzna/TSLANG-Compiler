@@ -10,13 +10,20 @@ class Grammar(object):
     tokens = Tokens.tokens
         
     lexer = []
+  
     errors = 0
     error_messages = []
     @staticmethod
     def print_error_messages():
         for message in Grammar.error_messages:
             print(message)
-   
+    @staticmethod
+    def add_error(message):
+        if not message in Grammar.error_messages:
+            Grammar.error_messages.append(message)
+            Grammar.errors += 1 
+
+
     #  prog rules
     def p_prog1(p):
         '''prog : func'''
@@ -59,7 +66,7 @@ class Grammar(object):
 
     def p_func_error(p): # For errors in the paranthesis
         '''func : FUNCTION iden LPARANT error RPARANT RETURNS type COLON body END'''
-        Grammar.error_messages.append(f"{p[4].lineno}: Error corrected. The syntax is 'function iden ( flist ) returns type: body end'")
+        Grammar.add_error("Error corrected. The syntax is 'function iden ( flist ) returns type: body end'")
         p[4] = p[4].value
         p[0] = "func"
         p[0] = {
@@ -128,7 +135,7 @@ class Grammar(object):
 
     def p_stmt3_error(p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt'''
-        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt'")
+        Grammar.add_error("Error corrected. The syntax is 'if ( clist ) stmt'")
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
@@ -151,7 +158,7 @@ class Grammar(object):
 
     def p_stmt4_error(p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt ELSE stmt'''
-        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'if ( clist ) stmt else stmt'")
+        Grammar.add_error("Error corrected. The syntax is 'if ( clist ) stmt else stmt'")
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
@@ -174,7 +181,7 @@ class Grammar(object):
 
     def p_stmt5_error(p): # For errors in the paranthesis
         '''stmt : WHILE LPARANT error RPARANT DO stmt'''
-        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'while ( expr ) do stmt'")
+        Grammar.add_error("Error corrected. The syntax is 'while ( expr ) do stmt'")
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
@@ -246,7 +253,7 @@ class Grammar(object):
 
     def p_expr1_error(p): # For errors in the paranthesis
         '''expr : iden LPARANT error RPARANT'''
-        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'iden ( clist )'")
+        Grammar.add_error("Error corrected. The syntax is 'iden ( clist )'")
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
@@ -269,7 +276,7 @@ class Grammar(object):
 
     def p_expr2_error(p): # For errors in the brackets
         '''expr : expr LBRACKET error RBRACKET'''
-        Grammar.error_messages.append(f"{p[3].lineno}: Error corrected. The syntax is 'expr [ expr ]'")
+        Grammar.add_error("Error corrected. The syntax is 'expr [ expr ]'")
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
@@ -293,7 +300,7 @@ class Grammar(object):
 
     def p_expr3_error(p): # For errors when you put "";" instead of ":"
         '''expr : expr QUEST_MARK expr error expr'''
-        Grammar.error_messages.append(f"{p[4].lineno}: Error corrected. The syntax is 'expr ? expr : expr'")
+        Grammar.add_error("Error corrected. The syntax is 'expr ? expr : expr'")
         p[4] = p[4].value
         p[0] = "expr"
         p[0] = {
@@ -353,7 +360,7 @@ class Grammar(object):
 
     def p_expr6_error(p):
         '''expr : LPARANT error RPARANT'''
-        Grammar.error_messages.append(f"{p[2].lineno}: Error corrected. The syntax is '( expr )'")
+        Grammar.add_error("Error corrected. The syntax is '( expr )'")
         p[2] = p[2].value
         p[0] = "expr"
         p[0] = {
@@ -509,12 +516,12 @@ class Grammar(object):
     # Error rule for syntax errors
     def p_error(p):
         if p:
-            Grammar.error_messages.append(f"{p.lineno}: Syntax error at token: {p.value} ")
+            Grammar.add_error(f"{p.lineno}: Syntax error at token: {p.value} ")
             Grammar.errors += 1
             # Just discard the token and tell the parser it's okay.
             #parser.errok()
         else:
-            Grammar.error_messages.append("Syntax error at EOF")
+            Grammar.add_error("Syntax error at EOF")
 
     #Set up precedence
     precedence = (

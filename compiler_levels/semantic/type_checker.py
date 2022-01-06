@@ -157,7 +157,7 @@ class TypeChecker(NodeVisitor):
             function_symbol = self.global_symbol_table.get(function_name)
             function_type = function_symbol.type.type_value["name"]
             if res != function_type:
-                TypeChecker.add_error(f"{node.expr.lineno}: Returning wrong type for function '{function_name}'. Should return: '{function_type}', you're returning: '{res}'")
+                TypeChecker.add_error(f"{node.expr.lineno}: Returning wrong type for function '{function_name}'. must return: '{function_type}', you're returning: '{res}'")
         # did'nt found the corresponding function to this return
         else:
             TypeChecker.add_error(f"{node.expr.lineno}: Shouldn'n have put return here!")
@@ -235,7 +235,7 @@ class TypeChecker(NodeVisitor):
                 arg_type = arguments[i]
                 if par_type != arg_type:
                     # handle semantic error
-                    TypeChecker.add_error(f"{node.clist.lineno}: {i+1}th argument of function '{function_iden}' type should be '{par_type}'")
+                    TypeChecker.add_error(f"{node.clist.lineno}: {i+1}th argument of function '{function_iden}' type must be '{par_type}'")
                     return function_symbol.type
             # if number of arguments and their types where correct, return function iden's type
             return function_symbol.type
@@ -270,9 +270,9 @@ class TypeChecker(NodeVisitor):
 
         else:
             #print(type_of_array_iden, type_of_array_index)
-            TypeChecker.add_error(f'{node.expr.lineno}: Id of the aray should of type \'Array\'!')
+            TypeChecker.add_error(f'{node.expr.lineno}: Id of the aray must of type \'Array\'!')
             if type_of_array_index != "Int":
-                TypeChecker.add_error(f'{node.expr.lineno}: index of the array should be of type \'Int\'!')
+                TypeChecker.add_error(f'{node.expr.lineno}: index of the array must be of type \'Int\'!')
             return "Nil"
 
 
@@ -313,7 +313,7 @@ class TypeChecker(NodeVisitor):
             return second_operand
 
         if first_operand != second_operand:
-            TypeChecker.add_error(f'{node.expr.lineno}: Two sides of \'{operator}\' be of same type! expr1 is of type: \'{first_operand}\' and expr2 is of type: \'{second_operand}\' ')
+            TypeChecker.add_error(f'{node.expr.lineno}: Two sides of \'{operator}\' must be of same type! expr1 is of type: \'{first_operand}\' and expr2 is of type: \'{second_operand}\' ')
             return "Nil"
         #print(f'first operand type is {first_operand} and second is {second_operand}')
         return first_operand

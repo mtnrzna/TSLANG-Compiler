@@ -18,6 +18,7 @@ class Compiler(object):
         data = read_from_file(file_address)
         #self.lexer.build(data)
         self.parser.build(data)
+        type_checker = TypeChecker()
         try:
             show_tree(config.syntax_tree)
 
@@ -37,7 +38,6 @@ class Compiler(object):
                 print(f"***Congrats! No parser errors!***")
 
             #semantic errors
-            type_checker = TypeChecker()
             type_checker.visit(config.ast, None)
             if TypeChecker.errors != 0 and not Compiler.compiled_failed:
                 print(f"***{TypeChecker.errors} semantic errors detected***")
