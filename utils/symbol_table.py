@@ -24,6 +24,11 @@ class SymbolTable(object):
         self.symbols = {}
         self.name = name
         self.parent = parent
+        self.children = []
+        # If this table has a parent, add this table to its children so the tables
+        # could traverse bottom up as well as top down
+        if parent:
+            parent.children.append(self)
 
     def put(self, symbol):  # get variable or function from symbol table
         if self.symbols.__contains__(symbol.name):
