@@ -1,4 +1,4 @@
-function find(Array A, Int x) returns Int:
+function find(Array A) returns Int:
     val Array n;
     x = n;
     val Int x;

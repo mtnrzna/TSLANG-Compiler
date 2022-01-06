@@ -1,5 +1,4 @@
 from compiler_levels.lexer.tokens import Tokens
-from utils.file import read_from_file
 from compiler_levels.lexer.lexer import Lexer
 from compiler_levels.lexer.tokens import Tokens
 from compiler_levels.parser.parser import Parser
@@ -23,8 +22,7 @@ class Compiler(object):
     compiled_failed = False
 
 
-    def compile(self, file_address):
-        data = read_from_file(file_address)
+    def compile(self, data):
         #self.lexer.build(data)
         self.parser.build(data)
         try:
