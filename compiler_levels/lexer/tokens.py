@@ -1,3 +1,6 @@
+from utils.color_prints import Colorprints
+
+
 class Tokens(object):
 
     errors = 0
@@ -5,7 +8,7 @@ class Tokens(object):
     @staticmethod
     def print_error_messages():
         for message in Tokens.error_messages:
-            print(message)
+            Colorprints.print_in_red(message)
     @staticmethod
     def add_error(message):
         if not message in Tokens.error_messages:

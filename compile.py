@@ -11,6 +11,7 @@ from compiler_levels.IR_generation.IR_generator import IRGenerator
 import config
 from utils.symbol_table import SymbolTable
 from compiler_levels.IR_generation.run_tsvm import RunTSVM
+from utils.color_prints import Colorprints
 
 
 class Compiler(object):
@@ -38,39 +39,43 @@ class Compiler(object):
 
         #lexer errors
         if Tokens.errors != 0 and not Compiler.compiled_failed:
-            print(f"***{Tokens.errors} lexer errors detected***")
+            Colorprints.print_in_yellow(f"***{Tokens.errors} lexer errors detected***")
             Tokens.print_error_messages()
         elif Tokens.errors == 0 and not Compiler.compiled_failed:
-            print(f"***Congrats! No lexer errors!***")
+            Colorprints.print_in_green(f"***Congrats! No lexer errors!***")
         
         #parser errors
         if Grammar.errors != 0 and not Compiler.compiled_failed:
-            print(f"***{Grammar.errors} parser errors detected***")
+            Colorprints.print_in_yellow(f"***{Grammar.errors} parser errors detected***")
             Grammar.print_error_messages()
         elif Grammar.errors == 0 and not Compiler.compiled_failed:
-            print(f"***Congrats! No parser errors!***")
+            Colorprints.print_in_green(f"***Congrats! No parser errors!***")
 
         #semantic errors
         self.preprocess.visit(config.ast, None)
         self.type_checker.visit(config.ast, None)
         if SemanticErrors.errors != 0 and not Compiler.compiled_failed:
-            print(f"***{SemanticErrors.errors} semantic errors detected***")
+            Colorprints.print_in_yellow(f"***{SemanticErrors.errors} semantic errors detected***")
             SemanticErrors.print_error_messages()
         elif SemanticErrors.errors == 0 and not Compiler.compiled_failed:
-            print(f"***Congrats! No semantic errors!***")
+            Colorprints.print_in_green(f"***Congrats! No semantic errors!***")
 
         #IR generartion
-        self.IR_generator.visit(config.ast, None)
+        if Tokens.errors == 0 and Grammar.errors == 0 and SemanticErrors.errors == 0:
+            self.IR_generator.visit(config.ast, None)
 
-        f = open(".\compiler_levels\IR_generation\generated_IR.txt", "w")
-        f.write(config.IR_code)
-        f.close()
+            f = open(".\compiler_levels\IR_generation\generated_IR.txt", "w")
+            f.write(config.IR_code)
+            f.close()
 
-        self.run_tsvm.run()
+
+            Colorprints.print_in_lightPurple("***TSLANG Terminal***")
+
+            self.run_tsvm.run()
 
                 
         #except:
         #    Compiler.compiled_failed = True
 
         if Compiler.compiled_failed:
-            print("Compiled failed with unrecoverable error/errors")
+            Colorprints.print_in_red("Compiled failed with unrecoverable error/errors")

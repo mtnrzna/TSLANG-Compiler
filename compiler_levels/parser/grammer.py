@@ -1,5 +1,6 @@
 from compiler_levels.lexer.tokens import Tokens
 import config
+from utils.color_prints import Colorprints
 from utils.syntax_tree import SyntaxTreeUtil
 from utils.AST import *
 from compiler_levels.lexer.tokens import Tokens
@@ -16,7 +17,7 @@ class Grammar(object):
     @staticmethod
     def print_error_messages():
         for message in Grammar.error_messages:
-            print(message)
+            Colorprints.print_in_red(message)
     @staticmethod
     def add_error(message):
         if not message in Grammar.error_messages:

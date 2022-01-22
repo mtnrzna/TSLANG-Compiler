@@ -8,6 +8,7 @@ class RunTSVM(object):
 
     def run(self):        
         #subprocess.run(["gcc", "-w", "-o", ".\compiler_levels\IR_generation\\tsvm\\a.exe", ".\compiler_levels\IR_generation\\tsvm\\tsvm.c"])
-        subprocess.run([".\compiler_levels\IR_generation\\tsvm.exe", ".\compiler_levels\IR_generation\generated_IR.txt"])
+        return_code = subprocess.run([".\compiler_levels\IR_generation\\tsvm.exe", ".\compiler_levels\IR_generation\generated_IR.txt"]).returncode
+        print(f"return {return_code}")
         # character "\" before characters "t" and "a" should be escaped! 
         
