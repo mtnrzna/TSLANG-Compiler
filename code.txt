@@ -1,31 +1,9 @@
-function find(Array A) returns Int:
-    val Array n;
-    x = n;
-    val Int x;
-    i = 0;
-    foreach(n of A):
-        if (n == k):
-            return i;
-
---
-  --    #kjhfklsdhfjkd oinveir int jhdjhsd 
---
-        end
-        i = i +1;
-        n(5);
-    end
-    return -1;
-end
 function main() returns Int:
-    val Array A;
-    val Int a;
-    A = createArray(a);
-    A[0] = 3;
-    A[1] = 8;
-    A[2] = 5;
-    exit(a);
-    printInt(find(A, a, A,22 ));
-    printInt(find(A));
-    printInt(find(A, A));
-    return A;
+    val Int i;
+    i= 1;
+    i = i+1;
+    if(i<2):
+        i = 10;
+    end
+	return i;
 end

@@ -1,8 +1,9 @@
 from utils.symbol_table import *
 import utils.AST as AST
-from compiler_levels.semantic.node_visitor import NodeVisitor
+from utils.node_visitor import NodeVisitor
 from compiler_levels.semantic.semantic_errors import SemanticErrors
 import config
+
 
 class TypeChecker(NodeVisitor):
 
@@ -23,10 +24,7 @@ class TypeChecker(NodeVisitor):
         #print(f"visiting: func")
         function_symbol = table.get(node.iden.iden_value["name"])
         function_name = function_symbol.name
-        function_body_block = []
-        for i in range(len(table.children)):
-            if table.children[i].name == function_name+"_function_body_block_table":
-                function_body_block = table.children[i]
+        function_body_block = self.find_symbol_table(f"{function_name}_function_body_block_table", table)
 
         self.visit(node.body, function_body_block)
 
@@ -57,30 +55,30 @@ class TypeChecker(NodeVisitor):
     def visit_Stmt3(self, node, table):
         #print(f"visiting: stmt3")
         self.visit(node.expr, table)
-        if_block_symbol_table = SymbolTable(table, "if_block") # symbol table for "if" block
+        if_block_symbol_table = self.find_symbol_table(f"if_block_{node.lineno}", table) # symbol table for "if" block
         self.visit(node.stmt, if_block_symbol_table)
 
 
     def visit_Stmt4(self, node, table):
         #print(f"visiting: stmt4")
         self.visit(node.expr, table)
-        if_block_symbol_table = SymbolTable(table, "if_block") # symbol table for "if" block
+        if_block_symbol_table = self.find_symbol_table(f"if_block_{node.lineno}", table) # symbol table for "if" block
         self.visit(node.stmt, if_block_symbol_table)
-        else_block_symbol_table = SymbolTable(table, "else_block") # symbol table for "else" block
+        else_block_symbol_table = self.find_symbol_table(f"else_block_{node.lineno}", table) # symbol table for "else" block
         self.visit(node.stmt2, else_block_symbol_table)
 
 
     def visit_Stmt5(self, node, table):
         #print(f"visiting: stmt5")
         self.visit(node.expr, table)
-        do_block_symbol_table = SymbolTable(table, "do_block") # symbol table for "do" block of a while
+        do_block_symbol_table = self.find_symbol_table(f"do_block_{node.lineno}", table) # symbol table for "do" block of a while
         self.visit(node.stmt, do_block_symbol_table)
 
 
     def visit_Stmt6(self, node, table):
         #print(f"visiting: stmt6")
         self.visit(node.expr, table)
-        foreach_block_symbol_table = SymbolTable(table, "foreach_block") # symbol table for "foreach" block
+        foreach_block_symbol_table = self.find_symbol_table(f"foreach_block_{node.lineno}", table) # symbol table for "foreach" block
         name = node.iden.iden_value["name"]
         type = "Int"
         iden = VariableSymbol(name, type)
@@ -112,7 +110,7 @@ class TypeChecker(NodeVisitor):
 
     def visit_Stmt8(self, node, table):
         #print(f"visiting: stmt8")
-        body_block_symbol_table = SymbolTable(table, "body_block") # symbol table for "body" block
+        body_block_symbol_table = self.find_symbol_table(f"body_block_{node.lineno}", table) # symbol table for "body" block
         self.visit(node.body, body_block_symbol_table)
 
     
@@ -129,34 +127,11 @@ class TypeChecker(NodeVisitor):
         #check if function exists with this id
         # if not found, it's type automatically(in get function) is set to None
         if isinstance(function_symbol, FunctionSymbol):
-            #print("function FOUND", function_iden)
             # get parameters
-            #print("******", function_symbol.parameters)
-            parameters = []
-            for parameter in function_symbol.parameters:
-                try:
-                    parameter = parameter["type"].type_value["name"]
-                except:
-                    parameter =  parameter["type"] # this is for builtin functions
-                parameters.append(parameter)
-            parameters.reverse()
+            parameters = self.get_parameters(function_symbol)
 
             # get arguments
-            arguments = []
-            clist = node.clist
-            if not isinstance(clist, AST.Empty):
-                if clist.expr:
-                    res = self.visit(clist, table)
-                    if not isinstance(res, str):
-                        res = res.type_value["name"]
-                    arguments.append(res)
-                    while hasattr(clist, "clist"):
-                        clist = clist.clist
-                        if (not isinstance(clist, AST.Empty)):
-                            res = self.visit(clist, table)
-                            if not isinstance(res, str):
-                                res = res.type_value["name"]
-                            arguments.append(res)
+            arguments = self.get_arguments(node, table)
 
             
             #print(f"{node.clist.lineno}: function: {function_iden}, arguments: {arguments}, parameters: {parameters}")
@@ -215,8 +190,6 @@ class TypeChecker(NodeVisitor):
 
 
 
-
-
     def visit_Expr3(self, node, table):
         #print(f"visiting: expr3")
         condition_expr = self.visit(node.expr, table)
@@ -259,7 +232,18 @@ class TypeChecker(NodeVisitor):
     def visit_Expr5(self, node, table):
         #print(f"visiting: expr5")
         #operator
-        return self.visit(node.expr, table)
+        operand = self.visit(node.expr, table)
+        operator = node.oper["name"]
+        if operand == "Int" :
+            return operand
+        elif operand == "Nil" and operator == "!":
+            return "Int"
+        elif operator == "!":
+            SemanticErrors.add_error({"message": f'{node.expr.lineno}: The operand of the \'{operator}\' must be of type \'Int\' or \'Nil\' ', "lineno":node.expr.lineno})
+            return "Nil"
+        else:
+            SemanticErrors.add_error({"message": f'{node.expr.lineno}: The operand of the \'{operator}\' must be of type \'Int\' ', "lineno":node.expr.lineno})
+            return "Nil"
 
 
     def visit_Expr6(self, node, table):
@@ -345,3 +329,41 @@ class TypeChecker(NodeVisitor):
 
         exit_funcition_symbol = FunctionSymbol("exit", "Int", [{"iden": "n", "type": "Int"}] )
         table.put(exit_funcition_symbol)
+
+
+    def find_symbol_table(self, name, parent):
+        for i in range(len(parent.children)):
+            if parent.children[i].name == name:
+                return parent.children[i]
+
+
+    def get_parameters(self, function_symbol):
+        parameters = []
+        for parameter in function_symbol.parameters:
+            try:
+                parameter = parameter["type"].type_value["name"]
+            except:
+                parameter =  parameter["type"] # this is for builtin functions
+            parameters.append(parameter)
+        parameters.reverse()
+        return parameters
+
+
+    def get_arguments(self, node, table):
+        #get arguments
+        arguments = []
+        clist = node.clist
+        if not isinstance(clist, AST.Empty):
+            if clist.expr:
+                res = self.visit(clist, table)
+                if not isinstance(res, str) and res:
+                    res = res.type_value["name"]
+                arguments.append(res)
+                while hasattr(clist, "clist"):
+                    clist = clist.clist
+                    if (not isinstance(clist, AST.Empty)):
+                        res = self.visit(clist, table)
+                        if not isinstance(res, str):
+                            res = res.type_value["name"]
+                        arguments.append(res)
+        return arguments

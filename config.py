@@ -5,3 +5,5 @@ def init():
     global ast
     ast = []
     global global_symbol_table
+    global iR_code 
+    IR_code = [] 

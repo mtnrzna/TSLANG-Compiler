@@ -1,10 +1,11 @@
 from utils.symbol_table import *
 import utils.AST as AST
-from compiler_levels.semantic.node_visitor import NodeVisitor
-import config
+from utils.node_visitor import NodeVisitor
 from compiler_levels.semantic.semantic_errors import SemanticErrors
-class PreProcess(NodeVisitor):
+import config
 
+
+class PreProcess(NodeVisitor):
 
     def __init__(self):
         self.create_and_push_builtin_funcs(config.global_symbol_table)
@@ -21,17 +22,11 @@ class PreProcess(NodeVisitor):
 
     def visit_Func(self, node, table):
         #print(f"visiting: func")
-        parameters = []
-        flist = node.flist
+
+        parameters = self.get_parameters(node)
         function_name= node.iden.iden_value["name"]
-        if not isinstance(flist, AST.Empty):
-            if flist.iden:
-                parameters.append({"iden": flist.iden, "type": flist.type})
-            while hasattr(flist, "flist"):
-                flist = flist.flist
-                if (not isinstance(flist, AST.Empty)):
-                    parameters.append({"iden": flist.iden, "type": flist.type})
-        parameters.reverse()
+
+
         name = node.iden.iden_value["name"]
 
         function_symbol = FunctionSymbol(name, node.type, parameters)
@@ -72,27 +67,27 @@ class PreProcess(NodeVisitor):
 
     def visit_Stmt3(self, node, table):
         #print(f"visiting: stmt3")
-        if_block_symbol_table = SymbolTable(table, "if_block") # symbol table for "if" block
+        if_block_symbol_table = SymbolTable(table, f"if_block_{node.lineno}") # symbol table for "if" block
         self.visit(node.stmt, if_block_symbol_table)
 
 
     def visit_Stmt4(self, node, table):
         #print(f"visiting: stmt4")
-        if_block_symbol_table = SymbolTable(table, "if_block") # symbol table for "if" block
+        if_block_symbol_table = SymbolTable(table, f"if_block_{node.lineno}") # symbol table for "if" block
         self.visit(node.stmt, if_block_symbol_table)
-        else_block_symbol_table = SymbolTable(table, "else_block") # symbol table for "else" block
+        else_block_symbol_table = SymbolTable(table, f"else_block_{node.lineno}") # symbol table for "else" block
         self.visit(node.stmt2, else_block_symbol_table)
 
 
     def visit_Stmt5(self, node, table):
         #print(f"visiting: stmt5")
-        do_block_symbol_table = SymbolTable(table, "do_block") # symbol table for "do" block of a while
+        do_block_symbol_table = SymbolTable(table, f"do_block_{node.lineno}") # symbol table for "do" block of a while
         self.visit(node.stmt, do_block_symbol_table)
 
 
     def visit_Stmt6(self, node, table):
         #print(f"visiting: stmt6")
-        foreach_block_symbol_table = SymbolTable(table, "foreach_block") # symbol table for "foreach" block
+        foreach_block_symbol_table = SymbolTable(table, f"foreach_block_{node.lineno}") # symbol table for "foreach" block
         name = node.iden.iden_value["name"]
         type = "Int"
         iden = VariableSymbol(name, type)
@@ -106,7 +101,7 @@ class PreProcess(NodeVisitor):
 
     def visit_Stmt8(self, node, table):
         #print(f"visiting: stmt8")
-        body_block_symbol_table = SymbolTable(table, "body_block") # symbol table for "body" block
+        body_block_symbol_table = SymbolTable(table, f"body_block_{node.lineno}") # symbol table for "body" block
         self.visit(node.body, body_block_symbol_table)
 
     
@@ -153,3 +148,17 @@ class PreProcess(NodeVisitor):
 
         exit_funcition_symbol = FunctionSymbol("exit", "Int", [{"iden": "n", "type": "Int"}] )
         table.put(exit_funcition_symbol)
+
+
+    def get_parameters(self, node):
+        parameters = []
+        flist = node.flist
+        if not isinstance(flist, AST.Empty):
+            if flist.iden:
+                parameters.append({"iden": flist.iden, "type": flist.type})
+            while hasattr(flist, "flist"):
+                flist = flist.flist
+                if (not isinstance(flist, AST.Empty)):
+                    parameters.append({"iden": flist.iden, "type": flist.type})
+        parameters.reverse()
+        return parameters
