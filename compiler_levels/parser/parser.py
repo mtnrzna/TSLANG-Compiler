@@ -1,5 +1,4 @@
 import ply.yacc as yacc
-from compiler_levels.parser.grammer import Grammar
 
 class Parser(object):
     def __init__(self, Grammer):

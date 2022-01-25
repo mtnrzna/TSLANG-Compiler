@@ -1,11 +1,15 @@
 from compile import Compiler
-from utils.color_prints import Colorprints
-from utils.file import read_from_file
 
 file_address = input("\033[97m {}\033[00m" .format("File Path: "))
-#try:
-data = read_from_file(file_address)
-compiler = Compiler()
-compiler.compile(data)
-#except:
-    #print("Invalid File Path...")
+file_not_found = False
+try:
+    with open(file_address) as f:
+        data = f.read()
+except:
+    file_not_found = True
+
+if not file_not_found:
+    compiler = Compiler()
+    compiler.compile(data)
+else:
+    print("Invalid File Path...")

@@ -4,7 +4,6 @@ from utils.color_prints import Colorprints
 from utils.syntax_tree import SyntaxTreeUtil
 from utils.AST import *
 from compiler_levels.lexer.tokens import Tokens
-from utils.symbol_table import SymbolTable
 
 class Grammar(object):
     

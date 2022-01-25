@@ -1,4 +1,3 @@
-from utils.symbol_table import SymbolTable
 def init():
     global syntax_tree
     syntax_tree = []

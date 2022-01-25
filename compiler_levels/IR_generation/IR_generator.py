@@ -1,9 +1,7 @@
-from ast import expr
 from atexit import register
 from utils.symbol_table import *
 import utils.AST as AST
 from utils.node_visitor import NodeVisitor
-from compiler_levels.semantic.semantic_errors import SemanticErrors
 import config
 
 

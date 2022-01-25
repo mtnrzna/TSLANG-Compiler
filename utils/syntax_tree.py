@@ -1,4 +1,4 @@
-from anytree import NodeMixin, RenderTree
+from anytree import NodeMixin
 import uuid
 
 

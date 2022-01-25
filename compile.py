@@ -15,18 +15,18 @@ from utils.color_prints import Colorprints
 
 
 class Compiler(object):
+    def __init__(self):
+        config.global_symbol_table = SymbolTable(None, "global")
+        tokens = Tokens()
+        lexer = Lexer(tokens)
+        Grammar.lexer = lexer.lexer # lexer attribute in lexer object of Lexer class!
 
-    config.global_symbol_table = SymbolTable(None, "global")
-    tokens = Tokens()
-    lexer = Lexer(tokens)
-    Grammar.lexer = lexer.lexer # lexer attribute in lexer object of Lexer class!
-    parser = Parser(Grammar)
-    type_checker = TypeChecker()
-    preprocess = PreProcess()
-    compiled_failed = False
-    IR_generator = IRGenerator() 
-
-    run_tsvm = RunTSVM()
+        self.parser = Parser(Grammar)
+        self.type_checker = TypeChecker()
+        self.preprocess = PreProcess()
+        self.compiled_failed = False
+        self.IR_generator = IRGenerator() 
+        self.run_tsvm = RunTSVM()
     
 
 
@@ -34,30 +34,31 @@ class Compiler(object):
         #self.lexer.build(data)
         self.parser.build(data)
         #try:
-        show_tree(config.syntax_tree)
-
-
+        try:
+            show_tree(config.syntax_tree)
+        except:
+            Colorprints.print_in_black("***Couldn't build the syntax tree :(***")
         #lexer errors
-        if Tokens.errors != 0 and not Compiler.compiled_failed:
+        if Tokens.errors != 0 and not self.compiled_failed:
             Colorprints.print_in_yellow(f"***{Tokens.errors} lexer errors detected***")
             Tokens.print_error_messages()
-        elif Tokens.errors == 0 and not Compiler.compiled_failed:
+        elif Tokens.errors == 0 and not self.compiled_failed:
             Colorprints.print_in_green(f"***Congrats! No lexer errors!***")
         
         #parser errors
-        if Grammar.errors != 0 and not Compiler.compiled_failed:
+        if Grammar.errors != 0 and not self.compiled_failed:
             Colorprints.print_in_yellow(f"***{Grammar.errors} parser errors detected***")
             Grammar.print_error_messages()
-        elif Grammar.errors == 0 and not Compiler.compiled_failed:
+        elif Grammar.errors == 0 and not self.compiled_failed:
             Colorprints.print_in_green(f"***Congrats! No parser errors!***")
 
         #semantic errors
         self.preprocess.visit(config.ast, None)
         self.type_checker.visit(config.ast, None)
-        if SemanticErrors.errors != 0 and not Compiler.compiled_failed:
+        if SemanticErrors.errors != 0 and not self.compiled_failed:
             Colorprints.print_in_yellow(f"***{SemanticErrors.errors} semantic errors detected***")
             SemanticErrors.print_error_messages()
-        elif SemanticErrors.errors == 0 and not Compiler.compiled_failed:
+        elif SemanticErrors.errors == 0 and not self.compiled_failed:
             Colorprints.print_in_green(f"***Congrats! No semantic errors!***")
 
         #IR generartion
@@ -73,9 +74,10 @@ class Compiler(object):
 
             self.run_tsvm.run()
 
-                
+        else:
+            self.compiled_failed = True                
         #except:
-        #    Compiler.compiled_failed = True
+        #    self.compiled_failed = True
 
-        if Compiler.compiled_failed:
-            Colorprints.print_in_red("Compiled failed with unrecoverable error/errors")
+        if self.compiled_failed:
+            Colorprints.print_in_red("!!! Compiled failed :( !!!")

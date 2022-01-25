@@ -1,5 +1,4 @@
 import ply.lex as lex
-from compiler_levels.lexer.tokens import Tokens
 
 class Lexer(object):
     def __init__(self, tokens):
