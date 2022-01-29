@@ -1,0 +1,74 @@
+proc printInt
+    call iput, r0
+    ret
+
+proc createArray
+    mov r1, 1
+    add r1, r0, r1
+    mov r2, 8
+    mul r2, r1, r2
+    call mem, r2
+    st r0, r2
+    mov r0, r2
+    ret
+
+proc arrayLength
+    ld r1, r0
+    mov r0, r1
+    ret
+
+proc main
+	mov r0, 0
+    mov r1, r0
+    call printInt, r1
+    mov r2, 0
+    mov r3, 0
+	mov r4, 6
+	mov r3, r4
+    mov r5, r3
+    call createArray, r5
+	mov r2, r5
+	mov r6, 3
+	mov r7, 1
+	mov r8, 8
+	add r7, r6, r7
+	mul r8, r7, r8
+	add r9, r2, r8
+	ld r10, r9
+	mov r11, 45
+	st r11, r9
+    mov r13, r2
+    call arrayLength, r13
+	mov r3, r13
+    mov r14, r3
+    call printInt, r14
+	mov r15, 3
+	mov r16, 1
+	mov r17, 8
+	add r16, r15, r16
+	mul r17, r16, r17
+	add r18, r2, r17
+	ld r19, r18
+    mov r20, r19
+    call printInt, r20
+	mov r21, 3
+	mov r22, 1
+	mov r23, 8
+	add r22, r21, r22
+	mul r23, r22, r23
+	add r24, r2, r23
+	ld r25, r24
+	mov r26, 63
+	add r25, r25, r26
+    mov r27, r25
+    call printInt, r27
+	mov r28, 5555
+	mov r29, 8
+	div r28, r28, r29
+    mov r30, r28
+    call printInt, r30
+	mov r31, 0
+    mov r0, r31
+	call rel, r5
+    ret
+

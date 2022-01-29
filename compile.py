@@ -7,7 +7,7 @@ from compiler_levels.parser.parser import Parser
 from compiler_levels.semantic.type_checker import TypeChecker
 from compiler_levels.semantic.preprocess import PreProcess
 from compiler_levels.IR_generation.IR_generator import IRGenerator
-from compiler_levels.IR_generation.run_tsvm import RunTSVM
+from compiler_levels.tsvm.run_tsvm import RunTSVM
 from utils.show_tree import show_tree
 import config
 from utils.color_prints import Colorprints
@@ -36,7 +36,11 @@ class Compiler(object):
 
 
     def compile(self, data, show_syntax_tree=False, print_error_messages=True):
+
         #self.lexer.build(data)
+        if data.strip() == "":
+            Colorprints.print_in_red("There was no code in that file!")
+            return
         self.parser.build(data)
         try:
             if show_syntax_tree:
@@ -74,7 +78,7 @@ class Compiler(object):
             if self.lexer_errors.errors == 0 and self.parser_errors.errors == 0 and self.semantic_errors.errors == 0:
                 self.IR_generator.visit(config.ast, None)
 
-                f = open(".\compiler_levels\IR_generation\generated_IR.txt", "w")
+                f = open(".\generated_IR.out", "w")
                 f.write(config.IR_code)
                 f.close()
 

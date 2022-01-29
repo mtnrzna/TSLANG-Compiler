@@ -9,7 +9,7 @@ class RunTSVM(object):
 
     def run(self):        
         #subprocess.run(["gcc", "-w", "-o", ".\compiler_levels\IR_generation\\tsvm\\tsvm.exe", ".\compiler_levels\IR_generation\\tsvm\\tsvm.c"])
-        return_code = subprocess.run([".\compiler_levels\IR_generation\\tsvm.exe", ".\compiler_levels\IR_generation\generated_IR.txt"]).returncode
+        return_code = subprocess.run([".\compiler_levels\\tsvm\\tsvm.exe", ".\generated_IR.out"]).returncode
         if return_code == 0:
             Colorprints.print_in_purple(f"execution ended with return code: {return_code}")
         else:
