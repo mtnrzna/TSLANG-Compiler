@@ -1,11 +1,13 @@
 from utils.symbol_table import *
 import utils.AST as AST
 from utils.node_visitor import NodeVisitor
-from compiler_levels.semantic.semantic_errors import SemanticErrors
 import config
 
 
 class TypeChecker(NodeVisitor):
+
+    def __init__(self, semantic_errors):
+        self.semantic_errors = semantic_errors
 
     def visit_Prog1(self, node, table):
         #print(f"visiting: prog1")
@@ -98,10 +100,10 @@ class TypeChecker(NodeVisitor):
             function_symbol = config.global_symbol_table.get(function_name)
             function_type = function_symbol.type
             if res != function_type:
-                SemanticErrors.add_error({"message": f"{node.expr.lineno}: Returning wrong type for function '{function_name}'. must return: '{function_type}', you're returning: '{res}'", "lineno":node.expr.lineno})
+                self.semantic_errors.add_error({"message": f"{node.expr.lineno}: Returning wrong type for function '{function_name}'. must return: '{function_type}', you're returning: '{res}'", "lineno":node.expr.lineno})
         # did'nt found the corresponding function to this return
         else:
-            SemanticErrors.add_error({"message": f"{node.expr.lineno}: Shouldn'n have put return here!","lineno": node.expr.lineno})
+            self.semantic_errors.add_error({"message": f"{node.expr.lineno}: Shouldn'n have put return here!","lineno": node.expr.lineno})
             
 
 
@@ -135,7 +137,7 @@ class TypeChecker(NodeVisitor):
             # check number of arguments with number of parameters 
             if len(parameters) != len(arguments):
                 # handle semantic error
-                    SemanticErrors.add_error({"message": f"{node.clist.lineno}: Function '{function_iden}' expected {len(parameters)} arguments but got {len(arguments)} instead", "lineno": node.clist.lineno})
+                    self.semantic_errors.add_error({"message": f"{node.clist.lineno}: Function '{function_iden}' expected {len(parameters)} arguments but got {len(arguments)} instead", "lineno": node.clist.lineno})
                     return function_symbol.type
 
             # check arguments types with parameters types
@@ -144,7 +146,7 @@ class TypeChecker(NodeVisitor):
                 arg_type = arguments[i]
                 if par_type != arg_type:
                     # handle semantic error
-                    SemanticErrors.add_error({"message": f"{node.clist.lineno}: {i+1}th argument of function '{function_iden}' type must be '{par_type}'", "lineno":node.clist.lineno})
+                    self.semantic_errors.add_error({"message": f"{node.clist.lineno}: {i+1}th argument of function '{function_iden}' type must be '{par_type}'", "lineno":node.clist.lineno})
                     return function_symbol.type
             # if number of arguments and their types where correct, return function iden's type
             return function_symbol.type
@@ -159,13 +161,13 @@ class TypeChecker(NodeVisitor):
             result = table.get(function_iden, check_parent=False)
             #if there is not a var with the same name in the same scope then it would make a function that returns "Nil" in the same scope
             if not result:
-                SemanticErrors.add_error({"message": f'{node.iden.lineno}: Function: \'{function_iden}\' not defined', "lineno": node.iden.lineno})
+                self.semantic_errors.add_error({"message": f'{node.iden.lineno}: Function: \'{function_iden}\' not defined', "lineno": node.iden.lineno})
                 new_declared_func_for_error_handling = FunctionSymbol(function_iden, "Nil",[])
                 table.put(new_declared_func_for_error_handling)
 
             #if there is a var in the same scope with this name, return it's type
             else:
-                SemanticErrors.add_error({"message": f'{node.iden.lineno}: \'{function_iden}\' is not a function', "lineno": node.iden.lineno})
+                self.semantic_errors.add_error({"message": f'{node.iden.lineno}: \'{function_iden}\' is not a function', "lineno": node.iden.lineno})
                 return result.type
 
 
@@ -179,9 +181,9 @@ class TypeChecker(NodeVisitor):
 
         else:
             #print(type_of_array_iden, type_of_array_index)
-            SemanticErrors.add_error({"message": f'{node.expr.lineno}: Id of the aray must of type \'Array\'!', "lineno": node.expr.lineno})
+            self.semantic_errors.add_error({"message": f'{node.expr.lineno}: Id of the aray must of type \'Array\'!', "lineno": node.expr.lineno})
             if type_of_array_index != "Int":
-                SemanticErrors.add_error({"message": f'{node.expr.lineno}: index of the array must be of type \'Int\'!', "lineno": node.expr.lineno})
+                self.semantic_errors.add_error({"message": f'{node.expr.lineno}: index of the array must be of type \'Int\'!', "lineno": node.expr.lineno})
             return "Nil"
 
 
@@ -220,7 +222,7 @@ class TypeChecker(NodeVisitor):
             return second_operand
 
         if first_operand != second_operand:
-            SemanticErrors.add_error({"message": f'{node.expr.lineno}: Two sides of \'{operator}\' must be of same type! expr1 is of type: \'{first_operand}\' and expr2 is of type: \'{second_operand}\' ', "lineno":node.expr.lineno})
+            self.semantic_errors.add_error({"message": f'{node.expr.lineno}: Two sides of \'{operator}\' must be of same type! expr1 is of type: \'{first_operand}\' and expr2 is of type: \'{second_operand}\' ', "lineno":node.expr.lineno})
             return "Nil"
         #print(f'first operand type is {first_operand} and second is {second_operand}')
         return first_operand
@@ -236,10 +238,10 @@ class TypeChecker(NodeVisitor):
         elif operand == "Nil" and operator == "!":
             return "Int"
         elif operator == "!":
-            SemanticErrors.add_error({"message": f'{node.expr.lineno}: The operand of the \'{operator}\' must be of type \'Int\' or \'Nil\' ', "lineno":node.expr.lineno})
+            self.semantic_errors.add_error({"message": f'{node.expr.lineno}: The operand of the \'{operator}\' must be of type \'Int\' or \'Nil\' ', "lineno":node.expr.lineno})
             return "Nil"
         else:
-            SemanticErrors.add_error({"message": f'{node.expr.lineno}: The operand of the \'{operator}\' must be of type \'Int\' ', "lineno":node.expr.lineno})
+            self.semantic_errors.add_error({"message": f'{node.expr.lineno}: The operand of the \'{operator}\' must be of type \'Int\' ', "lineno":node.expr.lineno})
             return "Nil"
 
 
@@ -300,7 +302,7 @@ class TypeChecker(NodeVisitor):
         name = node.iden_value["name"]
         symbol = table.get(name)
         if not symbol:
-            SemanticErrors.add_error({"message": f"{node.lineno}: '{name}' is not declared", "lineno":node.lineno})
+            self.semantic_errors.add_error({"message": f"{node.lineno}: '{name}' is not declared", "lineno":node.lineno})
             new_declared_variable_for_error_handling = FunctionSymbol(name, "Nil", [])
             table.put(new_declared_variable_for_error_handling)
             return "Nil"

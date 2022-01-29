@@ -1,20 +1,7 @@
-from utils.color_prints import Colorprints
-
-
 class Tokens(object):
 
-    errors = 0
-    error_messages = []
-    @staticmethod
-    def print_error_messages():
-        for message in Tokens.error_messages:
-            Colorprints.print_in_red(message)
-    @staticmethod
-    def add_error(message):
-        if not message in Tokens.error_messages:
-            Tokens.error_messages.append(message)
-            Tokens.errors += 1 
-
+    def __init__(self, lexer_errors):
+        self.lexer_errors = lexer_errors
 
     # List of token names.   This is always required
     reserved = {
@@ -119,5 +106,5 @@ class Tokens(object):
 
     # Error handling rule
     def t_error(self, t):
-        Tokens.add_error(f"{t.lexer.lineno}: Illegal character '%s'" % t.value[0])
+        self.lexer_errors.add_error({"message":f"{t.lexer.lineno}: Illegal character '{t.value[0]}'","lineno": t.lexer.lineno})
         t.lexer.skip(1)

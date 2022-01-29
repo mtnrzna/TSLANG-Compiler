@@ -1,14 +1,14 @@
 from utils.symbol_table import *
 import utils.AST as AST
 from utils.node_visitor import NodeVisitor
-from compiler_levels.semantic.semantic_errors import SemanticErrors
 import config
 
 
 class PreProcess(NodeVisitor):
 
-    def __init__(self):
+    def __init__(self, semantic_errors):
         self.create_and_push_builtin_funcs(config.global_symbol_table)
+        self.semantic_errors = semantic_errors
     
     def visit_Prog1(self, node, table):
         #print(f"visiting: prog1")
@@ -32,7 +32,7 @@ class PreProcess(NodeVisitor):
         function_symbol = FunctionSymbol(name, node.type.type_value["name"], parameters)
         if not table.put(function_symbol):
             # if there is a function or var with the same identifier
-            SemanticErrors.add_error({"message":f"{node.flist.lineno}: identifier '{name}' already exists", "lineno":node.flist.lineno})
+            self.semantic_errors.add_error({"message":f"{node.flist.lineno}: identifier '{name}' already exists", "lineno":node.flist.lineno})
             return
         function_body_table = SymbolTable(table, function_name+"_function_body_block_table")
         for par in parameters:
@@ -40,7 +40,7 @@ class PreProcess(NodeVisitor):
             type = par["type"].type_value["name"]
             #print(f"funcion {function_name}'s arg: name: '{name}', type: {type}'" )
             if not function_body_table.put(VariableSymbol(name, type)):
-                SemanticErrors.add_error({"message": f'{node.flist.lineno}: \'{name}\' already defined', "lineno": node.flist.lineno})
+                self.semantic_errors.add_error({"message": f'{node.flist.lineno}: \'{name}\' already defined', "lineno": node.flist.lineno})
         self.visit(node.body, function_body_table)
         
 
@@ -110,7 +110,7 @@ class PreProcess(NodeVisitor):
         name = node.iden.iden_value["name"]
         type = node.type.type_value["name"]
         if not table.put(VariableSymbol(name, type)):
-                SemanticErrors.add_error({"message": f'{node.iden.lineno}: \'{name}\' already defined', "lineno":node.iden.lineno})
+                self.semantic_errors.add_error({"message": f'{node.iden.lineno}: \'{name}\' already defined', "lineno":node.iden.lineno})
         self.visit(node.iden, table)
         self.visit(node.type, table)
 

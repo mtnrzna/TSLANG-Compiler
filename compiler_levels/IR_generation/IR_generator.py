@@ -1,4 +1,3 @@
-from atexit import register
 from utils.symbol_table import *
 import utils.AST as AST
 from utils.node_visitor import NodeVisitor
@@ -7,10 +6,10 @@ import config
 
 class IRGenerator(NodeVisitor):
 
-    reginster_index = 0
-    label_index = 0
-
     def __init__(self):
+        self.reginster_index = 0
+        self.label_index = 0
+        self.memory_allocated_registers = []
         self.create_and_push_builtin_funcs()
     
     
@@ -27,7 +26,6 @@ class IRGenerator(NodeVisitor):
 {code}'''
                 self.builtin_funcs[i]["included"] = True
         config.IR_code = self.delete_empty_lines_from_code(code)
-        self.free_memory()
         return code
 
     def visit_Prog2(self, node, table):
@@ -51,7 +49,6 @@ class IRGenerator(NodeVisitor):
                 self.builtin_funcs[i]["included"] = True
 
         config.IR_code = self.delete_empty_lines_from_code(code)
-        self.free_memory()
         return code
 
 
@@ -254,7 +251,14 @@ class IRGenerator(NodeVisitor):
         expr_code = res["code"]
         expr_returned_reg = res["reg"]
 
-        code = f'''{expr_code}
+        #if we're returning from main function, we have to release all allocated Array registers
+        if table.name == "main_function_body_block_table":
+            code = f'''{expr_code}
+    mov r0, {expr_returned_reg}
+{self.get_release_memory_codes()}
+    ret'''
+        else:
+            code = f'''{expr_code}
     mov r0, {expr_returned_reg}
     ret'''
         return code
@@ -296,8 +300,10 @@ class IRGenerator(NodeVisitor):
 
         returning_reg = self.create_register()
 
-
-
+        #If function being called is "createArray", add the returned register to release it later
+        if function_iden == "createArray":
+            self.memory_allocated_registers.append(returning_reg)
+        
         for i in range(len(arguments)):
             if i == 0:
                 if len(arguments) == 1:
@@ -319,7 +325,7 @@ class IRGenerator(NodeVisitor):
 
         if not arguments:
             return {"reg": returning_reg, 
-            "code" : f'''call {function_iden}, {returning_reg}'''}
+            "code" : f'''\tcall {function_iden}, {returning_reg}'''}
 
 
         else:            
@@ -780,5 +786,8 @@ label2_printArray:
 
 
 
-    def free_memory(self):
-        pass
+    def get_release_memory_codes(self):
+        code = ""
+        for reg in self.memory_allocated_registers:
+            code +=f"\n\tcall rel, {reg}"
+        return code
