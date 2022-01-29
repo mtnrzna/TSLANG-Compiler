@@ -1,0 +1,46 @@
+function main() returns Int:
+    val Int a;
+    val Int b;
+    val Int c;
+    val Int d;
+
+    val Int x;
+    val Int y;
+    
+    x = getInt();
+    y = getInt();
+
+    a = add(x, y);
+    b = sub(x, y);
+    c = multi(x, y);
+    d = div(x, y);
+    printInt(a);
+    printInt(b);
+    printInt(c);
+    printInt(d);
+    return 0;
+end
+
+
+function add(Int x, Int y) returns Int:
+    --printInt(x);
+    val Int n;
+    n = x + y;
+    return n;
+end
+
+function sub(Int x, Int y) returns Int:
+    return x - y;
+end
+
+function div(Int x, Int y) returns Int:
+    return x / y;
+end
+
+
+
+function multi(Int x, Int y) returns Int:
+    val Int l;
+    l = x *y;
+    return l;
+end

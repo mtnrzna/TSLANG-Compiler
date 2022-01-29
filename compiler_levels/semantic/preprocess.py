@@ -29,7 +29,7 @@ class PreProcess(NodeVisitor):
 
         name = node.iden.iden_value["name"]
 
-        function_symbol = FunctionSymbol(name, node.type, parameters)
+        function_symbol = FunctionSymbol(name, node.type.type_value["name"], parameters)
         if not table.put(function_symbol):
             # if there is a function or var with the same identifier
             SemanticErrors.add_error({"message":f"{node.flist.lineno}: identifier '{name}' already exists", "lineno":node.flist.lineno})
@@ -140,10 +140,16 @@ class PreProcess(NodeVisitor):
         printInt_funcition_symbol = FunctionSymbol("printInt", "Int", [{"iden": "n", "type": "Int"}] )
         table.put(printInt_funcition_symbol)
 
-        createArray_funcition_symbol = FunctionSymbol("createArray", "Array", [{"iden": "n", "type": "Int"}] )
+        createArray_funcition_symbol = FunctionSymbol("createArray", "Array", [{"iden": "x", "type": "Int"}] )
         table.put(createArray_funcition_symbol)
 
-        arrayLength_funcition_symbol = FunctionSymbol("arrayLength", "Int", [{"iden": "v", "type": "Int"}] )
+        getArray_funcition_symbol = FunctionSymbol("getArray", "Array", [{"iden": "A", "type": "Array"}] )
+        table.put(getArray_funcition_symbol)
+
+        printArray_funcition_symbol = FunctionSymbol("printArray", "Array", [{"iden": "A", "type": "Array"}] )
+        table.put(printArray_funcition_symbol)
+
+        arrayLength_funcition_symbol = FunctionSymbol("arrayLength", "Int", [{"iden": "A", "type": "Array"}] )
         table.put(arrayLength_funcition_symbol)
 
         exit_funcition_symbol = FunctionSymbol("exit", "Int", [{"iden": "n", "type": "Int"}] )

@@ -1,0 +1,16 @@
+function main() returns Int:
+    printInt(0);
+    val Array A;
+    val Int i;
+    i = 6;
+    A = createArray(i);
+    A[3] = 45;
+    
+    i = arrayLength(A);
+    printInt(i);
+    
+    printInt(A[3]);
+    printInt(A[3]+63);
+    printInt(5555 /8);
+    return 0;
+end

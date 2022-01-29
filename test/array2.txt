@@ -1,0 +1,14 @@
+function main() returns Int:
+    val Int i;
+    val Array A;
+
+
+    i = getInt();
+    A = createArray(i);
+    getArray(A);
+
+
+    printArray(A);
+
+	return 0;
+end

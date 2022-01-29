@@ -7,9 +7,6 @@ import config
 
 class TypeChecker(NodeVisitor):
 
-    def __init__(self):
-        self.create_and_push_builtin_funcs(config.global_symbol_table)
-    
     def visit_Prog1(self, node, table):
         #print(f"visiting: prog1")
         self.visit(node.func, config.global_symbol_table)
@@ -77,10 +74,10 @@ class TypeChecker(NodeVisitor):
 
     def visit_Stmt6(self, node, table):
         #print(f"visiting: stmt6")
-        self.visit(node.expr, table)
+        expr_type = self.visit(node.expr, table)
         foreach_block_symbol_table = self.find_symbol_table(f"foreach_block_{node.lineno}", table) # symbol table for "foreach" block
         name = node.iden.iden_value["name"]
-        type = "Int"
+        setattr(node, "type", expr_type)
         iden = VariableSymbol(name, type)
         foreach_block_symbol_table.put(iden)
         self.visit(node.stmt, foreach_block_symbol_table)
@@ -99,7 +96,7 @@ class TypeChecker(NodeVisitor):
         if table:
             function_name = table.name.split("_function_body_block_table")[0]
             function_symbol = config.global_symbol_table.get(function_name)
-            function_type = function_symbol.type.type_value["name"]
+            function_type = function_symbol.type
             if res != function_type:
                 SemanticErrors.add_error({"message": f"{node.expr.lineno}: Returning wrong type for function '{function_name}'. must return: '{function_type}', you're returning: '{res}'", "lineno":node.expr.lineno})
         # did'nt found the corresponding function to this return
@@ -289,7 +286,8 @@ class TypeChecker(NodeVisitor):
 
     def visit_Type(self, node, table):
         #print(f"visiting: type")
-        pass
+        type = node.type_value["name"]
+        return type
 
 
     def visit_Num(self, node, table):
@@ -313,22 +311,6 @@ class TypeChecker(NodeVisitor):
         pass
 
 
-
-    def create_and_push_builtin_funcs(self, table):
-        getInt_function_symbol = FunctionSymbol("getInt", "Int", [] )
-        table.put(getInt_function_symbol)
-
-        printInt_funcition_symbol = FunctionSymbol("printInt", "Int", [{"iden": "n", "type": "Int"}] )
-        table.put(printInt_funcition_symbol)
-
-        createArray_funcition_symbol = FunctionSymbol("createArray", "Array", [{"iden": "n", "type": "Int"}] )
-        table.put(createArray_funcition_symbol)
-
-        arrayLength_funcition_symbol = FunctionSymbol("arrayLength", "Int", [{"iden": "v", "type": "Int"}] )
-        table.put(arrayLength_funcition_symbol)
-
-        exit_funcition_symbol = FunctionSymbol("exit", "Int", [{"iden": "n", "type": "Int"}] )
-        table.put(exit_funcition_symbol)
 
 
     def find_symbol_table(self, name, parent):

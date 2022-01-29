@@ -1,6 +1,6 @@
 from compile import Compiler
 
-file_address = input("\033[97m {}\033[00m" .format("File Path: "))
+file_address = input("\033[97m{}\033[00m" .format("File Path: "))
 file_not_found = False
 try:
     with open(file_address) as f:
@@ -10,6 +10,6 @@ except:
 
 if not file_not_found:
     compiler = Compiler()
-    compiler.compile(data)
+    compiler.compile(data, show_syntax_tree=False, print_error_messages=True)
 else:
     print("Invalid File Path...")
