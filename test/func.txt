@@ -1,3 +1,11 @@
+function add(Int x, Int y) returns Int:
+    --printInt(x);
+    val Int n;
+    n = x + y;
+    return n;
+end
+
+
 function main() returns Int:
     val Int a;
     val Int b;
@@ -19,14 +27,6 @@ function main() returns Int:
     printInt(c);
     printInt(d);
     return 0;
-end
-
-
-function add(Int x, Int y) returns Int:
-    --printInt(x);
-    val Int n;
-    n = x + y;
-    return n;
 end
 
 function sub(Int x, Int y) returns Int:

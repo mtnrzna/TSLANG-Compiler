@@ -107,12 +107,7 @@ class PreProcess(NodeVisitor):
     
     def visit_Defvar(self, node, table):
         #print(f"visiting: defvar")
-        name = node.iden.iden_value["name"]
-        type = node.type.type_value["name"]
-        if not table.put(VariableSymbol(name, type)):
-                self.semantic_errors.add_error({"message": f'{node.iden.lineno}: \'{name}\' already defined', "lineno":node.iden.lineno})
-        self.visit(node.iden, table)
-        self.visit(node.type, table)
+        pass
 
             
 

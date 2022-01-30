@@ -17,6 +17,8 @@ function find(Array A, Int x) returns Int:
     return 0;
 end
 function main() returns Int:
+    var = 8;
+    val Int var;
     val Array A;
     val Int a;
     A = createArray(a);
