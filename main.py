@@ -1,4 +1,5 @@
 from compile import Compiler
+from utils.color_prints import Colorprints
 
 file_address = input("\033[97m{}\033[00m" .format("File Path: "))
 file_not_found = False
@@ -12,4 +13,4 @@ if not file_not_found:
     compiler = Compiler()
     compiler.compile(data, show_syntax_tree=True, print_error_messages=True)
 else:
-    print("Invalid File Path...")
+    Colorprints.print_in_red("Invalid File Path...")
