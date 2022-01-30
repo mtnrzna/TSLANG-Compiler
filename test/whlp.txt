@@ -1,0 +1,10 @@
+function main() returns Int:
+    
+    val Int n;
+    n = 0;
+    while(n < 5) do:
+        printInt(n);
+        n = n+1;
+    end
+    return 0;
+end

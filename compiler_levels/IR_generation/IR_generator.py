@@ -172,10 +172,14 @@ class IRGenerator(NodeVisitor):
         stmt_code = self.visit(node.stmt, do_block_symbol_table)
 
         label = self.create_label()
-        code = f'''{expr_code}
-\tjz {expr_returned_reg}, {label}
+        label2 = self.create_label()
+        code = f'''
+{label}:
+{expr_code}
+\tjz {expr_returned_reg}, {label2}
 {stmt_code}
-{label}:'''
+\tjmp {label}
+{label2}:'''
 
         return code
 
@@ -427,78 +431,89 @@ class IRGenerator(NodeVisitor):
 \tmov {expr_returned_reg}, {expr2_returned_reg}'''}
         
         if operator == "+":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tadd {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tadd {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
         
         if operator == "-":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tsub {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tsub {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
 
         if operator == "*":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tmul {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tmul {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
         
         if operator == "/":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tdiv {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tdiv {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
 
         if operator == "%":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tmod {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tmod {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
         
         if operator == "<":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tcmp< {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tcmp< {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
 
         if operator == ">":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tcmp> {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tcmp> {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
 
         if operator == "==":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tcmp= {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tcmp= {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
         
         if operator == "<=":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tcmp<= {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tcmp<= {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
 
         if operator == ">=":
-            return {"reg": expr_returned_reg, 
+            tmp_reg = self.create_register()
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tcmp>= {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
+\tcmp>= {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}'''}
 
         if operator == "!=":
+            tmp_reg = self.create_register()
             label = self.create_label()
             label2 = self.create_label()
 
-            return {"reg": expr_returned_reg, 
+            return {"reg": tmp_reg, 
             "code" : f'''{expr_returned_code}
 {expr2_returned_code}
-\tcmp= {expr_returned_reg}, {expr_returned_reg}, {expr2_returned_reg}
-\tjz {expr_returned_reg}, {label}
-\tmov {expr_returned_reg}, 0
+\tcmp= {tmp_reg}, {expr_returned_reg}, {expr2_returned_reg}
+\tjz {tmp_reg}, {label}
+\tmov {tmp_reg}, 0
 \tjmp {label2}
 {label}:
-\tmov {expr_returned_reg}, 1
+\tmov {tmp_reg}, 1
 {label2}:'''}
 
         if operator == "||":

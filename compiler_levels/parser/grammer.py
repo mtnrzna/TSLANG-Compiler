@@ -123,7 +123,7 @@ class Grammar(object):
 
     def p_stmt3_error(self, p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'if ( clist ) stmt'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'if ( expr ) stmt'","lineno": p.lineno})
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
@@ -146,7 +146,7 @@ class Grammar(object):
 
     def p_stmt4_error(self, p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt ELSE stmt'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'if ( clist ) stmt else stmt'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'if ( expr ) stmt else stmt'","lineno": p.lineno})
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {

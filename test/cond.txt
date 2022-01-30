@@ -1,0 +1,11 @@
+function main() returns Int:
+    val Int n;
+    n = getInt();
+    if(n ==10):
+        printInt(1);
+    end
+    else:
+        printInt(0);
+    end
+    return 0;
+end
