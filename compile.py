@@ -93,4 +93,4 @@ class Compiler(object):
             self.compiled_failed = True
 
         if self.compiled_failed:
-            Colorprints.print_in_red("!!! Compiled failed :( !!!")
+            Colorprints.print_in_red("!!! Compile failed :( !!!")
