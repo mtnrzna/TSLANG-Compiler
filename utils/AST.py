@@ -79,28 +79,27 @@ class Stmt2(Node):
         self.children = (defavr,)
 
 class Stmt3(Node):
-    def __init__(self, expr, stmt, lineno):
+    def __init__(self, expr, stmt, else_choice, lineno):
         self.lineno = lineno
         self.expr = expr
         self.stmt = stmt
-        self.children = (expr, stmt,)
+        self.else_choice = else_choice
+        self.children = (expr, stmt, else_choice,)
+
+class Else_choice2(Node):
+    def __init__(self, stmt, lineno):
+        self.lineno = lineno
+        self.stmt = stmt
+        self.children = (stmt,)
 
 class Stmt4(Node):
-    def __init__(self, expr, stmt, stmt2, lineno):
-        self.lineno = lineno
-        self.expr = expr
-        self.stmt = stmt
-        self.stmt2 = stmt2
-        self.children = (expr, stmt, stmt2,)
-
-class Stmt5(Node):
     def __init__(self, expr, stmt, lineno):
         self.lineno = lineno
         self.expr = expr
         self.stmt = stmt
         self.children = (expr, stmt,)
 
-class Stmt6(Node):
+class Stmt5(Node):
     def __init__(self, iden, expr, stmt, lineno):
         self.lineno = lineno
         self.iden = iden
@@ -108,13 +107,13 @@ class Stmt6(Node):
         self.stmt = stmt
         self.children = (iden, expr, stmt,)
 
-class Stmt7(Node):
+class Stmt6(Node):
     def __init__(self, expr, lineno):
         self.lineno = lineno
         self.expr = expr
         self.children = (expr,)
 
-class Stmt8(Node):
+class Stmt7(Node):
     def __init__(self, body, lineno):
         self.lineno = lineno
         self.body = body

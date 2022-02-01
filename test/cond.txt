@@ -4,8 +4,15 @@ function main() returns Int:
     if(n ==10):
         printInt(1);
     end
-    else:
-        printInt(0);
+    if(n -1 > 3):
+        printInt(3);
     end
+    else
+        printInt(0);
+    if(n > 5):
+        printInt(5);
+    end
+    else
+        printInt(0);
     return 0;
 end

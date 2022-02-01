@@ -2438,9 +2438,11 @@ def yacc(*, debug=yaccdebug, module=None, start=None,
 
         # Report shift/reduce and reduce/reduce conflicts
         if num_sr == 1:
-            errorlog.warning('1 shift/reduce conflict')
+            #errorlog.warning('1 shift/reduce conflict')
+            pass
         elif num_sr > 1:
-            errorlog.warning('%d shift/reduce conflicts', num_sr)
+            #errorlog.warning('%d shift/reduce conflicts', num_sr)
+            pass
 
         num_rr = len(lr.rr_conflicts)
         if num_rr == 1:

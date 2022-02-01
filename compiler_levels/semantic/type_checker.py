@@ -56,26 +56,29 @@ class TypeChecker(NodeVisitor):
         self.visit(node.expr, table)
         if_block_symbol_table = self.find_symbol_table(f"if_block_{node.lineno}", table) # symbol table for "if" block
         self.visit(node.stmt, if_block_symbol_table)
+        self.visit(node.else_choice, table)
+
+
+    def visit_Else_choice1(self, node, table):
+        #print(f"visiting: stmt4")
+        pass
+    
+
+    def visit_Else_choice2(self, node, table):
+        #print(f"visiting: stmt4")
+        else_block_symbol_table = self.find_symbol_table(f"else_block_{node.lineno}", table) # symbol table for "else" block
+        self.visit(node.stmt, else_block_symbol_table)
 
 
     def visit_Stmt4(self, node, table):
         #print(f"visiting: stmt4")
         self.visit(node.expr, table)
-        if_block_symbol_table = self.find_symbol_table(f"if_block_{node.lineno}", table) # symbol table for "if" block
-        self.visit(node.stmt, if_block_symbol_table)
-        else_block_symbol_table = self.find_symbol_table(f"else_block_{node.lineno}", table) # symbol table for "else" block
-        self.visit(node.stmt2, else_block_symbol_table)
-
-
-    def visit_Stmt5(self, node, table):
-        #print(f"visiting: stmt5")
-        self.visit(node.expr, table)
         do_block_symbol_table = self.find_symbol_table(f"do_block_{node.lineno}", table) # symbol table for "do" block of a while
         self.visit(node.stmt, do_block_symbol_table)
 
 
-    def visit_Stmt6(self, node, table):
-        #print(f"visiting: stmt6")
+    def visit_Stmt5(self, node, table):
+        #print(f"visiting: stmt5")
         expr_type = self.visit(node.expr, table)
         foreach_block_symbol_table = self.find_symbol_table(f"foreach_block_{node.lineno}", table) # symbol table for "foreach" block
         name = node.iden.iden_value["name"]
@@ -86,8 +89,8 @@ class TypeChecker(NodeVisitor):
 
 
 
-    def visit_Stmt7(self, node, table):
-        #print(f"visiting: stmt7")
+    def visit_Stmt6(self, node, table):
+        #print(f"visiting: stmt6")
         res = self.visit(node.expr, table)
         #finding function name
         function_name = []
@@ -107,8 +110,8 @@ class TypeChecker(NodeVisitor):
             
 
 
-    def visit_Stmt8(self, node, table):
-        #print(f"visiting: stmt8")
+    def visit_Stmt7(self, node, table):
+        #print(f"visiting: stmt7")
         body_block_symbol_table = self.find_symbol_table(f"body_block_{node.lineno}", table) # symbol table for "body" block
         self.visit(node.body, body_block_symbol_table)
 

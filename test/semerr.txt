@@ -7,7 +7,7 @@ function find(Array A, Int x) returns Int:
         if (n == k):
             return i;
 
---*******************************
+---------------------------------------------------------------------semantic errors
   --    #kjhfklsdhfjkd oinveir int jhdjhsd 
 --
         end

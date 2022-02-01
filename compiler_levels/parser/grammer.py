@@ -40,7 +40,7 @@ class Grammar(object):
 
 
 
-   
+
     #  func rules
     def p_func(self, p):
         '''func : FUNCTION iden LPARANT flist RPARANT RETURNS type COLON body END'''
@@ -54,7 +54,7 @@ class Grammar(object):
 
     def p_func_error(self, p): # For errors in the paranthesis
         '''func : FUNCTION iden LPARANT error RPARANT RETURNS type COLON body END'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'function iden ( flist ) returns type: body end'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'function iden ( flist ) returns type: body end'","lineno": self.lexer.lineno}, increment_number=False)
         p[4] = p[4].value
         p[0] = "func"
         p[0] = {
@@ -63,6 +63,8 @@ class Grammar(object):
             "st": SyntaxTreeUtil.create_node(p),
             "ast" : Func(p[2]["ast"], p[4], p[7]["ast"], p[9]["ast"], self.lexer.lineno)
         }
+
+
 
 
     def p_body1(self, p):
@@ -87,6 +89,8 @@ class Grammar(object):
         }
 
    
+
+
     #  stmt rules
     def p_stmt1(self, p):
         '''stmt : expr SEMICOLON'''
@@ -111,88 +115,114 @@ class Grammar(object):
 
 
     def p_stmt3(self, p):
-        '''stmt : IF LPARANT expr RPARANT stmt'''
+        '''stmt : IF LPARANT expr RPARANT stmt else_choice'''
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
             "lineno": self.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt3(p[3]["ast"], p[5]["ast"], self.lexer.lineno)
+            "ast": Stmt3(p[3]["ast"], p[5]["ast"], p[6]["ast"], self.lexer.lineno)
         }
 
 
     def p_stmt3_error(self, p): # For errors in the paranthesis
-        '''stmt : IF LPARANT error RPARANT stmt'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'if ( expr ) stmt'","lineno": p.lineno})
+        '''stmt : IF LPARANT error RPARANT stmt else_choice'''
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'if ( expr ) stmt'","lineno": self.lexer.lineno}, increment_number=False)
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
             "name":"expr",
             "lineno": self.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt3(p[3], p[5]["ast"], self.lexer.lineno)
+            "ast": Stmt3(p[3], p[5]["ast"], p[6]["ast"], self.lexer.lineno)
         }
+
+
+    def p_else_choice1(self, p):
+        '''else_choice : empty'''
+        p[0] = "else_choice"
+        p[0] = {
+            "name":"else_choice",
+            "lineno": self.lexer.lineno,
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Empty(self.lexer.lineno)
+        }
+
+
+    def p_else_choice2(self, p):
+        '''else_choice : ELSE stmt'''
+        p[0] = "else_choice"
+        p[0] = {
+            "name":"else_choice",
+            "lineno": self.lexer.lineno,
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Else_choice2(p[2]["ast"], self.lexer.lineno)
+        }
+
+        
+
 
     def p_stmt4(self, p):
-        '''stmt : IF LPARANT expr RPARANT stmt ELSE stmt'''
-        p[0] = "stmt"
-        p[0] = {
-            "name":"stmt",
-            "lineno": self.lexer.lineno,
-            "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt4(p[3]["ast"], p[5]["ast"], p[7]["ast"], self.lexer.lineno)
-        }
-
-
-    def p_stmt4_error(self, p): # For errors in the paranthesis
-        '''stmt : IF LPARANT error RPARANT stmt ELSE stmt'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'if ( expr ) stmt else stmt'","lineno": p.lineno})
-        p[3] = p[3].value
-        p[0] = "stmt"
-        p[0] = {
-            "name":"expr",
-            "lineno": self.lexer.lineno,
-            "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt4(p[3], p[5]["ast"], p[7]["ast"], self.lexer.lineno)
-        }
-
-    def p_stmt5(self, p):
         '''stmt : WHILE LPARANT expr RPARANT DO stmt'''
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
             "lineno": self.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Stmt5(p[3]["ast"], p[6]["ast"], self.lexer.lineno)
+            "ast": Stmt4(p[3]["ast"], p[6]["ast"], self.lexer.lineno)
         }
 
 
-    def p_stmt5_error(self, p): # For errors in the paranthesis
+    def p_stmt4_error(self, p): # For errors in the paranthesis
         '''stmt : WHILE LPARANT error RPARANT DO stmt'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'while ( expr ) do stmt'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'while ( expr ) do stmt'","lineno": self.lexer.lineno}, increment_number=False)
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
             "name":"expr",
             "lineno": self.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt5(p[3], p[6]["ast"], self.lexer.lineno)
+            "ast": Stmt4(p[3], p[6]["ast"], self.lexer.lineno)
         }
 
 
-    def p_stmt6(self, p):
+    def p_stmt4_error2(self, p): # When the programmer forgets to put "do" after left paranthesis
+        '''stmt : WHILE LPARANT expr RPARANT error stmt'''
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'while ( expr ) do stmt'","lineno": self.lexer.lineno}, increment_number=False)
+        p[3] = p[5].value
+        p[0] = "stmt"
+        p[0] = {
+            "name":"expr",
+            "lineno": self.lexer.lineno,
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Stmt4(p[3], p[6]["ast"], self.lexer.lineno)
+        }
+
+
+    def p_stmt5(self, p):
         '''stmt : FOREACH LPARANT iden OF expr RPARANT stmt'''
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
             "lineno": self.lexer.lineno,
             "st": SyntaxTreeUtil.create_node(p), 
-            "ast": Stmt6(p[3]["ast"], p[5]["ast"], p[7]["ast"], self.lexer.lineno)
+            "ast": Stmt5(p[3]["ast"], p[5]["ast"], p[7]["ast"], self.lexer.lineno)
         }
 
     
-    def p_stmt7(self, p):
+    def p_stmt6(self, p):
         '''stmt : RETURN expr SEMICOLON'''
+        p[0] = "stmt"
+        p[0] = {
+            "name":"stmt",
+            "lineno": self.lexer.lineno,
+            "st": SyntaxTreeUtil.create_node(p),
+            "ast": Stmt6(p[2]["ast"], self.lexer.lineno)
+        }
+
+
+    def p_stmt7(self, p):
+        '''stmt : COLON body END'''
         p[0] = "stmt"
         p[0] = {
             "name":"stmt",
@@ -202,18 +232,8 @@ class Grammar(object):
         }
 
 
-    def p_stmt8(self, p):
-        '''stmt : COLON body END'''
-        p[0] = "stmt"
-        p[0] = {
-            "name":"stmt",
-            "lineno": self.lexer.lineno,
-            "st": SyntaxTreeUtil.create_node(p),
-            "ast": Stmt8(p[2]["ast"], self.lexer.lineno)
-        }
 
 
-   
     #  devfvar rules
     def p_defvar(self, p):
         '''defvar : VAL type iden'''
@@ -227,6 +247,7 @@ class Grammar(object):
 
 
    
+
     #  expr rules
     def p_expr1(self, p):
         '''expr : iden LPARANT clist RPARANT'''
@@ -241,7 +262,7 @@ class Grammar(object):
 
     def p_expr1_error(self, p): # For errors in the paranthesis
         '''expr : iden LPARANT error RPARANT'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'iden ( clist )'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'iden ( clist )'","lineno": self.lexer.lineno}, increment_number=False)
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
@@ -264,7 +285,7 @@ class Grammar(object):
 
     def p_expr2_error(self, p): # For errors in the brackets
         '''expr : expr LBRACKET error RBRACKET'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'expr [ expr ]'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'expr [ expr ]'","lineno": self.lexer.lineno}, increment_number=False)
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
@@ -288,7 +309,7 @@ class Grammar(object):
 
     def p_expr3_error(self, p): # For errors when you put "";" instead of ":"
         '''expr : expr QUEST_MARK expr error expr'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is 'expr ? expr : expr'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is 'expr ? expr : expr'","lineno": self.lexer.lineno}, increment_number=False)
         p[4] = p[4].value
         p[0] = "expr"
         p[0] = {
@@ -346,9 +367,10 @@ class Grammar(object):
             "ast": Expr6(p[2]["ast"], self.lexer.lineno)
         }
 
+
     def p_expr6_error(self, p):
         '''expr : LPARANT error RPARANT'''
-        self.parser_errors.add_error({"message": "Error corrected. The syntax is '( expr )'","lineno": p.lineno})
+        self.parser_errors.add_error({"message": "!Hint!: The syntax is '( expr )'","lineno": self.lexer.lineno}, increment_number=False)
         p[2] = p[2].value
         p[0] = "expr"
         p[0] = {
@@ -381,7 +403,8 @@ class Grammar(object):
         }
 
     
-   
+
+
     #  flist rules
     def p_flist1(self, p):
         '''flist : empty'''
@@ -414,6 +437,7 @@ class Grammar(object):
             "st": SyntaxTreeUtil.create_node(p),
             "ast": Flist3(p[1]["ast"], p[2]["ast"], p[4]["ast"], self.lexer.lineno)
         }
+
 
 
 
@@ -452,6 +476,7 @@ class Grammar(object):
 
     
 
+
     # type rule
     def p_type(self, p):
         '''type : INT
@@ -480,6 +505,7 @@ class Grammar(object):
 
 
 
+
     # iden rule
     def p_iden(self, p):
         '''iden : ID'''
@@ -504,12 +530,11 @@ class Grammar(object):
     # Error rule for syntax errors
     def p_error(self, p):
         if p:
-            self.parser_errors.add_error({"message": f"{p.lineno}: Syntax error at token: {p.value}","lineno": p.lineno})
-            self.parser_errors.errors += 1
+            self.parser_errors.add_error({"message": f"{self.lexer.lineno}: Syntax error at token: {p.value}","lineno": self.lexer.lineno})
             # Just discard the token and tell the parser it's okay.
             #parser.errok()
         else:
-            self.parser_errors.add_error({"message": "Syntax error at EOF", "lineno": None})
+            self.parser_errors.add_error({"message": "Syntax error at EOF", "lineno": self.lexer.lineno})
     #Set up precedence
     precedence = (
         ('left', 'error'),

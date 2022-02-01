@@ -126,44 +126,50 @@ class IRGenerator(NodeVisitor):
         if_block_symbol_table = self.find_symbol_table(f"if_block_{node.lineno}", table) # symbol table for "if" block
         stmt_code = self.visit(node.stmt, if_block_symbol_table)
 
-        label = self.create_label()
-        code = f'''{expr_code}
+        label = ""
+        label2 = ""
+        else_choice_code = ""
+        if not isinstance(node.else_choice, AST.Empty):
+            else_choice_code = self.visit(node.else_choice, table)
+            label = self.create_label()
+            label2 = self.create_label()
+            code = f'''{expr_code}
+\tjz {expr_returned_reg}, {label}
+{stmt_code}
+\tjmp {label2}
+{label}:
+{else_choice_code}
+{label2}:'''
+        else:
+            label = self.create_label()
+            code = f'''{expr_code}
 \tjz {expr_returned_reg}, {label}
 {stmt_code}
 {label}:'''
 
         return code
 
-        
 
-        
-
-
-    def visit_Stmt4(self, node, table):
+    def visit_Else_choice1(self, node, table):
         #print(f"visiting: stmt4")
-        res = self.visit(node.expr, table)
-        expr_code = res["code"]
-        expr_returned_reg = res["reg"]
+        code = ""
+        return code
 
-        if_block_symbol_table = self.find_symbol_table(f"if_block_{node.lineno}", table) # symbol table for "if" block
-        stmt_code = self.visit(node.stmt, if_block_symbol_table)
 
+    def visit_Else_choice2(self, node, table):
+        #print(f"visiting: stmt4")
         else_block_symbol_table = self.find_symbol_table(f"else_block_{node.lineno}", table) # symbol table for "else" block
-        stmt2_code = self.visit(node.stmt2, else_block_symbol_table)
+        stmt_code = self.visit(node.stmt, else_block_symbol_table)
 
         label = self.create_label()
-        code = f'''{expr_code}
-\tjz {expr_returned_reg}, {label}
-{stmt_code}
-{label}:
-{stmt2_code}'''
+        code = f'''{stmt_code}'''
 
         return code
 
 
 
-    def visit_Stmt5(self, node, table):
-        #print(f"visiting: stmt5")
+    def visit_Stmt4(self, node, table):
+        #print(f"visiting: stmt4")
         res = self.visit(node.expr, table)
         expr_code = res["code"]
         expr_returned_reg = res["reg"]
@@ -184,8 +190,8 @@ class IRGenerator(NodeVisitor):
         return code
 
 
-    def visit_Stmt6(self, node, table):
-        #print(f"visiting: stmt6")
+    def visit_Stmt5(self, node, table):
+        #print(f"visiting: stmt5")
         foreach_block_symbol_table = self.find_symbol_table(f"foreach_block_{node.lineno}", table) # symbol table for "foreach" block
 
         name = node.iden.iden_value["name"]
@@ -249,8 +255,8 @@ class IRGenerator(NodeVisitor):
 
 
 
-    def visit_Stmt7(self, node, table):
-        #print(f"visiting: stmt7")
+    def visit_Stmt6(self, node, table):
+        #print(f"visiting: stmt6")
         res = self.visit(node.expr, table)
         expr_code = res["code"]
         expr_returned_reg = res["reg"]
@@ -258,19 +264,19 @@ class IRGenerator(NodeVisitor):
         #if we're returning from main function, we have to release all allocated Array registers
         if table.name == "main_function_body_block_table":
             code = f'''{expr_code}
-    mov r0, {expr_returned_reg}
+\tmov r0, {expr_returned_reg}
 {self.get_release_memory_codes()}
-    ret'''
+\tret'''
         else:
             code = f'''{expr_code}
-    mov r0, {expr_returned_reg}
-    ret'''
+\tmov r0, {expr_returned_reg}
+\tret'''
         return code
             
 
 
-    def visit_Stmt8(self, node, table):
-        #print(f"visiting: stmt8")
+    def visit_Stmt7(self, node, table):
+        #print(f"visiting: stmt7")
         body_block_symbol_table = self.find_symbol_table(f"body_block_{node.lineno}", table) # symbol table for "body" block
         body_code = self.visit(node.body, body_block_symbol_table)
         code = body_code
@@ -284,7 +290,7 @@ class IRGenerator(NodeVisitor):
         reg = self.initiate_var_symbol_register(name, table)
 
         code = f'''
-    mov {reg}, {0}'''
+\tmov {reg}, {0}'''
         return code
         
 
@@ -315,7 +321,7 @@ class IRGenerator(NodeVisitor):
                 else:
                      arguments_registers_string += f"{returning_reg}, "
                 arguments_codes_string += f'''{arguments[i]['code']}
-    mov {returning_reg}, {arguments[0]["reg"]}'''
+\tmov {returning_reg}, {arguments[0]["reg"]}'''
 
 
             elif i == len(arguments) - 1: 
@@ -335,7 +341,7 @@ class IRGenerator(NodeVisitor):
         else:            
             return {"reg": returning_reg, 
             "code" : f'''{arguments_codes_string}
-    call {function_iden}, {arguments_registers_string}'''}
+\tcall {function_iden}, {arguments_registers_string}'''}
 
 
 
@@ -646,14 +652,14 @@ class IRGenerator(NodeVisitor):
 
         self.builtin_funcs.append({"name":"getInt", "used":False, "included":False,
         "code":'''proc getInt
-    call iget, r0
-    ret'''})
+\tcall iget, r0
+\tret'''})
 
 
         self.builtin_funcs.append({"name":"printInt", "used":False, "included":False,
         "code":'''proc printInt
-    call iput, r0
-    ret'''})
+\tcall iput, r0
+\tret'''})
 
 
 
@@ -662,14 +668,14 @@ class IRGenerator(NodeVisitor):
         #also first cell of the Array has the value of n (length of the Array)
         self.builtin_funcs.append({"name":"createArray", "used":False, "included":False,
         "code":'''proc createArray
-    mov r1, 1
-    add r1, r0, r1
-    mov r2, 8
-    mul r2, r1, r2
-    call mem, r2
-    st r0, r2
-    mov r0, r2
-    ret'''})
+\tmov r1, 1
+\tadd r1, r0, r1
+\tmov r2, 8
+\tmul r2, r1, r2
+\tcall mem, r2
+\tst r0, r2
+\tmov r0, r2
+\tret'''})
 
 
         
@@ -677,49 +683,49 @@ class IRGenerator(NodeVisitor):
         #and it contains the length of the Array
         self.builtin_funcs.append({"name":"getArray", "used":False, "included":False,
         "code":'''proc getArray
-    ld r1, r0
-    mov r2, 1   
-    mov r3, 8   
+\tld r1, r0
+\tmov r2, 1   
+\tmov r3, 8   
 label_getArray:
-    cmp<= r4, r2, r1
-    jz r4, label2_getArray
-    mul r4, r2, r3
-    add r5, r0, r4
-    call iget, r6
-    st r6, r5
-    mov r7, 1
-    add r2, r2, r7
-    jmp label_getArray
+\tcmp<= r4, r2, r1
+\tjz r4, label2_getArray
+\tmul r4, r2, r3
+\tadd r5, r0, r4
+\tcall iget, r6
+\tst r6, r5
+\tmov r7, 1
+\tadd r2, r2, r7
+\tjmp label_getArray
 label2_getArray:
-    ret'''})
+\tret'''})
 
 
         #Argument of this function is the Array's identifer ( getArray(A) ), in lower level it is an register with the address of the first cell of the array
         #and it contains the length of the Array
         self.builtin_funcs.append({"name":"printArray", "used":False, "included":False,
         "code":'''proc printArray
-    ld r1, r0
-    mov r2, 1   
-    mov r3, 8   
+\tld r1, r0
+\tmov r2, 1   
+\tmov r3, 8   
 label_printArray:
-    cmp<= r4, r2, r1
-    jz r4, label2_printArray
-    mul r4, r2, r3
-    add r5, r0, r4
-    ld r6, r5
-    call iput, r6
-    mov r7, 1
-    add r2, r2, r7
-    jmp label_printArray
+\tcmp<= r4, r2, r1
+\tjz r4, label2_printArray
+\tmul r4, r2, r3
+\tadd r5, r0, r4
+\tld r6, r5
+\tcall iput, r6
+\tmov r7, 1
+\tadd r2, r2, r7
+\tjmp label_printArray
 label2_printArray:
-    ret'''})
+\tret'''})
 
 
         self.builtin_funcs.append({"name":"arrayLength", "used":False, "included":False,
         "code":'''proc arrayLength
-    ld r1, r0
-    mov r0, r1
-    ret'''})
+\tld r1, r0
+\tmov r0, r1
+\tret'''})
 
     def create_register(self):
         self.reginster_index += 1

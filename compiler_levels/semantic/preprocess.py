@@ -69,24 +69,28 @@ class PreProcess(NodeVisitor):
         #print(f"visiting: stmt3")
         if_block_symbol_table = SymbolTable(table, f"if_block_{node.lineno}") # symbol table for "if" block
         self.visit(node.stmt, if_block_symbol_table)
+        self.visit(node.else_choice, table)
+
+
+    def visit_Else_choice1(self, node, table):
+        #print(f"visiting: stmt4")
+        pass
+
+
+    def visit_Else_choice2(self, node, table):
+        #print(f"visiting: stmt4")
+        else_block_symbol_table = SymbolTable(table, f"else_block_{node.lineno}") # symbol table for "else" block
+        self.visit(node.stmt, else_block_symbol_table)
 
 
     def visit_Stmt4(self, node, table):
         #print(f"visiting: stmt4")
-        if_block_symbol_table = SymbolTable(table, f"if_block_{node.lineno}") # symbol table for "if" block
-        self.visit(node.stmt, if_block_symbol_table)
-        else_block_symbol_table = SymbolTable(table, f"else_block_{node.lineno}") # symbol table for "else" block
-        self.visit(node.stmt2, else_block_symbol_table)
-
-
-    def visit_Stmt5(self, node, table):
-        #print(f"visiting: stmt5")
         do_block_symbol_table = SymbolTable(table, f"do_block_{node.lineno}") # symbol table for "do" block of a while
         self.visit(node.stmt, do_block_symbol_table)
 
 
-    def visit_Stmt6(self, node, table):
-        #print(f"visiting: stmt6")
+    def visit_Stmt5(self, node, table):
+        #print(f"visiting: stmt5")
         foreach_block_symbol_table = SymbolTable(table, f"foreach_block_{node.lineno}") # symbol table for "foreach" block
         name = node.iden.iden_value["name"]
         type = "Int"
@@ -95,12 +99,12 @@ class PreProcess(NodeVisitor):
         self.visit(node.stmt, foreach_block_symbol_table)
 
 
-    def visit_Stmt7(self, node, table):
-        #print(f"visiting: stmt7")
+    def visit_Stmt6(self, node, table):
+        #print(f"visiting: stmt6")
         pass
 
-    def visit_Stmt8(self, node, table):
-        #print(f"visiting: stmt8")
+    def visit_Stmt7(self, node, table):
+        #print(f"visiting: stmt7")
         body_block_symbol_table = SymbolTable(table, f"body_block_{node.lineno}") # symbol table for "body" block
         self.visit(node.body, body_block_symbol_table)
 
@@ -110,13 +114,9 @@ class PreProcess(NodeVisitor):
         pass
 
             
-
- 
-
     def visit_Type(self, node, table):
         #print(f"visiting: type")
         pass
-
 
     def visit_Iden(self, node, table):
         #print(f"visiting: iden")

@@ -13,10 +13,11 @@ class CompilerErrors(object):
             Colorprints.print_in_red(er_msg["message"])
 
 
-    def add_error(self, error):
+    def add_error(self, error, increment_number=True):
         if not error in self.error_messages:
             self.error_messages.append(error)
-            self.errors += 1 
+            if increment_number:
+                self.errors += 1 
 
 
     def sort_by_lineno(self, er_msg):

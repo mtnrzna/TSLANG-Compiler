@@ -1,0 +1,17 @@
+function main() returns Int:
+    val Int a;
+    val Int b;
+    val Int c;
+    a = getInt();
+    b = getInt();
+    c = getInt();
+    printInt(sum3(a, b, c));
+    return 0;
+end
+
+
+function sum3(Int a, Int b, Int c) returns Int:
+    val Int sum;
+    sum = a + b + c;
+    return sum;
+end
