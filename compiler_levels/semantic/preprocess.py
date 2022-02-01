@@ -32,7 +32,7 @@ class PreProcess(NodeVisitor):
         function_symbol = FunctionSymbol(name, node.type.type_value["name"], parameters)
         if not table.put(function_symbol):
             # if there is a function or var with the same identifier
-            self.semantic_errors.add_error({"message":f"{node.flist.lineno}: identifier '{name}' already exists", "lineno":node.flist.lineno})
+            self.semantic_errors.add_error({"message":f"Identifier '{name}' already exists", "lineno":node.flist.lineno})
             return
         function_body_table = SymbolTable(table, function_name+"_function_body_block_table")
         for par in parameters:
@@ -40,7 +40,7 @@ class PreProcess(NodeVisitor):
             type = par["type"].type_value["name"]
             #print(f"funcion {function_name}'s arg: name: '{name}', type: {type}'" )
             if not function_body_table.put(VariableSymbol(name, type)):
-                self.semantic_errors.add_error({"message": f'{node.flist.lineno}: \'{name}\' already defined', "lineno": node.flist.lineno})
+                self.semantic_errors.add_error({"message": f"'{name}' already defined", "lineno": node.flist.lineno})
         self.visit(node.body, function_body_table)
         
 

@@ -1,8 +1,6 @@
 def init():
+    global code_file_path
     global syntax_tree
-    syntax_tree = []
     global ast
-    ast = []
     global global_symbol_table
     global iR_code 
-    IR_code = [] 

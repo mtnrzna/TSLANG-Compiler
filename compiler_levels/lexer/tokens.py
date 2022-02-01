@@ -106,5 +106,5 @@ class Tokens(object):
 
     # Error handling rule
     def t_error(self, t):
-        self.lexer_errors.add_error({"message":f"{t.lexer.lineno}: Illegal character '{t.value[0]}'","lineno": t.lexer.lineno})
+        self.lexer_errors.add_error({"message":f"Illegal character '{t.value[0]}'","lineno": t.lexer.lineno})
         t.lexer.skip(1)
