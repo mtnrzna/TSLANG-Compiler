@@ -3281,12 +3281,6 @@ state 99
     (39) expr -> expr . AMP_AMP expr
 
     SEMICOLON       reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
-    SMALL           reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
-    BIG             reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
-    EQUAL_EQUAL     reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
-    EXCL_EQUAL      reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
-    SMALL_EQUAL     reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
-    BIG_EQUAL       reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
     PIPE_PIPE       reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
     AMP_AMP         reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
     RPARANT         reduce using rule 38 (expr -> expr PIPE_PIPE expr .)
@@ -3302,6 +3296,12 @@ state 99
     MULTIPLY        shift and go to state 56
     DIVIDE          shift and go to state 57
     PERCENT         shift and go to state 58
+    SMALL           shift and go to state 59
+    BIG             shift and go to state 60
+    EQUAL_EQUAL     shift and go to state 61
+    EXCL_EQUAL      shift and go to state 62
+    SMALL_EQUAL     shift and go to state 63
+    BIG_EQUAL       shift and go to state 64
 
   ! LBRACKET        [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
   ! QUEST_MARK      [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
@@ -3311,12 +3311,12 @@ state 99
   ! MULTIPLY        [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
   ! DIVIDE          [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
   ! PERCENT         [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
-  ! SMALL           [ shift and go to state 59 ]
-  ! BIG             [ shift and go to state 60 ]
-  ! EQUAL_EQUAL     [ shift and go to state 61 ]
-  ! EXCL_EQUAL      [ shift and go to state 62 ]
-  ! SMALL_EQUAL     [ shift and go to state 63 ]
-  ! BIG_EQUAL       [ shift and go to state 64 ]
+  ! SMALL           [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
+  ! BIG             [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
+  ! EQUAL_EQUAL     [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
+  ! EXCL_EQUAL      [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
+  ! SMALL_EQUAL     [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
+  ! BIG_EQUAL       [ reduce using rule 38 (expr -> expr PIPE_PIPE expr .) ]
   ! PIPE_PIPE       [ shift and go to state 65 ]
   ! AMP_AMP         [ shift and go to state 66 ]
 
@@ -3344,12 +3344,6 @@ state 100
     (39) expr -> expr . AMP_AMP expr
 
     SEMICOLON       reduce using rule 39 (expr -> expr AMP_AMP expr .)
-    SMALL           reduce using rule 39 (expr -> expr AMP_AMP expr .)
-    BIG             reduce using rule 39 (expr -> expr AMP_AMP expr .)
-    EQUAL_EQUAL     reduce using rule 39 (expr -> expr AMP_AMP expr .)
-    EXCL_EQUAL      reduce using rule 39 (expr -> expr AMP_AMP expr .)
-    SMALL_EQUAL     reduce using rule 39 (expr -> expr AMP_AMP expr .)
-    BIG_EQUAL       reduce using rule 39 (expr -> expr AMP_AMP expr .)
     PIPE_PIPE       reduce using rule 39 (expr -> expr AMP_AMP expr .)
     AMP_AMP         reduce using rule 39 (expr -> expr AMP_AMP expr .)
     RPARANT         reduce using rule 39 (expr -> expr AMP_AMP expr .)
@@ -3365,6 +3359,12 @@ state 100
     MULTIPLY        shift and go to state 56
     DIVIDE          shift and go to state 57
     PERCENT         shift and go to state 58
+    SMALL           shift and go to state 59
+    BIG             shift and go to state 60
+    EQUAL_EQUAL     shift and go to state 61
+    EXCL_EQUAL      shift and go to state 62
+    SMALL_EQUAL     shift and go to state 63
+    BIG_EQUAL       shift and go to state 64
 
   ! LBRACKET        [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
   ! QUEST_MARK      [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
@@ -3374,12 +3374,12 @@ state 100
   ! MULTIPLY        [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
   ! DIVIDE          [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
   ! PERCENT         [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
-  ! SMALL           [ shift and go to state 59 ]
-  ! BIG             [ shift and go to state 60 ]
-  ! EQUAL_EQUAL     [ shift and go to state 61 ]
-  ! EXCL_EQUAL      [ shift and go to state 62 ]
-  ! SMALL_EQUAL     [ shift and go to state 63 ]
-  ! BIG_EQUAL       [ shift and go to state 64 ]
+  ! SMALL           [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
+  ! BIG             [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
+  ! EQUAL_EQUAL     [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
+  ! EXCL_EQUAL      [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
+  ! SMALL_EQUAL     [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
+  ! BIG_EQUAL       [ reduce using rule 39 (expr -> expr AMP_AMP expr .) ]
   ! PIPE_PIPE       [ shift and go to state 65 ]
   ! AMP_AMP         [ shift and go to state 66 ]
 

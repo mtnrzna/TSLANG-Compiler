@@ -539,7 +539,8 @@ class Grammar(object):
     #Set up precedence
     precedence = (
         ('left', 'error'),
-        ('left', 'AMP_AMP', 'EXCL_MARK', 'PIPE_PIPE', 'SMALL_EQUAL', 'BIG_EQUAL', 'EXCL_EQUAL', 'EQUAL_EQUAL', 'SMALL', 'BIG'),
+        ('left', 'AMP_AMP', 'PIPE_PIPE'),
+        ('left', 'EXCL_MARK', 'SMALL_EQUAL', 'BIG_EQUAL', 'EXCL_EQUAL', 'EQUAL_EQUAL', 'SMALL', 'BIG'),
         ('left', 'EQUAL', 'QUEST_MARK', 'COLON'),
         ('left', 'PLUS', 'MINUS'),
         ('left', 'MULTIPLY', 'DIVIDE', 'PERCENT'),
