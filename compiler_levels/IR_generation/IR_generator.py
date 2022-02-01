@@ -11,6 +11,7 @@ class IRGenerator(NodeVisitor):
         self.label_index = 0
         self.memory_allocated_registers = []
         self.create_and_push_builtin_funcs()
+        config.max_register_index_used_in_code = 0
     
     
     def visit_Prog1(self, node, table):
@@ -25,7 +26,7 @@ class IRGenerator(NodeVisitor):
                 code = f'''{self.builtin_funcs[i]["code"]}
 {code}'''
                 self.builtin_funcs[i]["included"] = True
-        config.IR_code = self.delete_empty_lines_from_code(code)
+        config.iR_code = code
         return code
 
     def visit_Prog2(self, node, table):
@@ -48,7 +49,7 @@ class IRGenerator(NodeVisitor):
 {code}'''
                 self.builtin_funcs[i]["included"] = True
 
-        config.IR_code = self.delete_empty_lines_from_code(code)
+        config.iR_code = code
         return code
 
 
@@ -728,6 +729,8 @@ label2_printArray:
 \tret'''})
 
     def create_register(self):
+        if self.reginster_index > config.max_register_index_used_in_code:
+            config.max_register_index_used_in_code = self.reginster_index
         self.reginster_index += 1
         return f"r{self.reginster_index - 1}"
 
@@ -793,18 +796,6 @@ label2_printArray:
         var_symbol = table.get(name)
         code = f"\tmov {var_symbol}, {value}"
         return code
-
-    def delete_empty_lines_from_code(self, code):
-        lines = code.split("\n")
-        non_empty_lines = [line for line in lines if line.strip() != ""]
-        modified_code = ""
-        for line in non_empty_lines:
-            modified_code += line + "\n"
-
-        #because only after keyword "ret", there should be an empty line
-        modified_code = modified_code.replace("ret", "ret\n")
-        return modified_code
-
 
 
     def get_release_memory_codes(self):

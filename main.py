@@ -14,6 +14,6 @@ except:
 
 if not file_not_found:
     compiler = Compiler()
-    compiler.compile(data, show_syntax_tree=False, print_error_messages=True)
+    compiler.compile(data, show_syntax_tree=True, print_error_messages=True)
 else:
     Colorprints.print_in_red("Invalid File Path...")

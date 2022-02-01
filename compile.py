@@ -7,6 +7,7 @@ from compiler_levels.parser.parser import Parser
 from compiler_levels.semantic.type_checker import TypeChecker
 from compiler_levels.semantic.preprocess import PreProcess
 from compiler_levels.IR_generation.IR_generator import IRGenerator
+from compiler_levels.IR_generation.IR_optimizer import IR_optimizer
 from compiler_levels.tsvm.run_tsvm import RunTSVM
 from utils.show_tree import show_tree
 import config
@@ -30,7 +31,8 @@ class Compiler(object):
         self.type_checker = TypeChecker(self.semantic_errors)
         self.preprocess = PreProcess(self.semantic_errors)
         self.compiled_failed = False
-        self.IR_generator = IRGenerator() 
+        self.iR_generator = IRGenerator() 
+        self.iR_optimizer = IR_optimizer()
         self.run_tsvm = RunTSVM()
     
 
@@ -74,17 +76,19 @@ class Compiler(object):
                 elif self.semantic_errors.errors == 0 and not self.compiled_failed:
                     Colorprints.print_in_green(f"***Congrats! No semantic errors!***")
 
-            #IR generartion
+            #IR generartion and Optimization
             if self.lexer_errors.errors == 0 and self.parser_errors.errors == 0 and self.semantic_errors.errors == 0:
-                self.IR_generator.visit(config.ast, None)
+                self.iR_generator.visit(config.ast, None)
+                
+                self.iR_optimizer.delete_mov_to_same_register()
+                self.iR_optimizer.delete_empty_lines_from_code()
 
                 f = open(".\generated_IR.out", "w")
-                f.write(config.IR_code)
+                f.write(config.iR_code)
                 f.close()
 
 
                 Colorprints.print_in_lightPurple("***TSLANG Terminal***")
-
                 self.run_tsvm.run()
 
             else:
