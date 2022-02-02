@@ -1,5 +1,5 @@
 from utils.symbol_table import SymbolTable
-from utils.compiler_errors import CompilerErrors
+from utils.compiler_messages import CompilerMessages
 from compiler_levels.lexer.tokens import Tokens
 from compiler_levels.lexer.lexer import Lexer
 from compiler_levels.parser.grammer import Grammar
@@ -17,19 +17,19 @@ from utils.color_prints import Colorprints
 class Compiler(object):
     def __init__(self):
         config.global_symbol_table = SymbolTable(None, "global")
-        self.lexer_errors = CompilerErrors()
-        self.parser_errors = CompilerErrors()
-        self.semantic_errors = CompilerErrors()
+        self.lexer_messages = CompilerMessages()
+        self.parser_messages = CompilerMessages()
+        self.semantic_messages = CompilerMessages()
 
-        self.tokens = Tokens(self.lexer_errors)
+        self.tokens = Tokens(self.lexer_messages)
         self.lexer = Lexer(self.tokens)
 
-        self.grammar = Grammar(self.parser_errors)
+        self.grammar = Grammar(self.parser_messages)
         self.grammar.lexer = self.lexer.lexer # lexer attribute in lexer object of Lexer class!
         self.parser = Parser(self.grammar)
 
-        self.type_checker = TypeChecker(self.semantic_errors)
-        self.preprocess = PreProcess(self.semantic_errors)
+        self.type_checker = TypeChecker(self.semantic_messages)
+        self.preprocess = PreProcess(self.semantic_messages)
         self.compiled_failed = False
         self.iR_generator = IRGenerator() 
         self.iR_optimizer = IR_optimizer()
@@ -37,7 +37,7 @@ class Compiler(object):
     
 
 
-    def compile(self, data, show_syntax_tree=False, print_error_messages=True):
+    def compile(self, data, show_syntax_tree=False, print_messages=True):
 
         #self.lexer.build(data)
         if data.strip() == "":
@@ -51,33 +51,39 @@ class Compiler(object):
                 except:
                     Colorprints.print_in_black("***Couldn't build the syntax tree :(***")
             #lexer errors
-            if print_error_messages:
-                if self.lexer_errors.errors != 0 and not self.compiled_failed:
-                    Colorprints.print_in_yellow(f"***{self.lexer_errors.errors} lexer errors detected***")
-                    self.lexer_errors.print_error_messages()
-                elif self.lexer_errors.errors == 0 and not self.compiled_failed:
+            if print_messages:
+                if self.lexer_messages.errors == 0 and not self.compiled_failed:
                     Colorprints.print_in_green(f"***Congrats! No lexer errors!***")
+                    self.lexer_messages.print_messages()
+
+                elif self.lexer_messages.errors != 0 and not self.compiled_failed:
+                    Colorprints.print_in_yellow(f"***{self.lexer_messages.errors} lexer errors detected***")
+                    self.lexer_messages.print_messages()
                 
                 #parser errors
-                if self.parser_errors.errors != 0 and not self.compiled_failed:
-                    Colorprints.print_in_yellow(f"***{self.parser_errors.errors} parser errors detected***")
-                    self.parser_errors.print_error_messages()
-                elif self.parser_errors.errors == 0 and not self.compiled_failed:
+                if self.parser_messages.errors == 0 and not self.compiled_failed:
                     Colorprints.print_in_green(f"***Congrats! No parser errors!***")
+                    self.parser_messages.print_messages()
+
+                elif self.parser_messages.errors != 0 and not self.compiled_failed:
+                    Colorprints.print_in_yellow(f"***{self.parser_messages.errors} parser errors detected***")
+                    self.parser_messages.print_messages()
 
             #semantic
             self.preprocess.visit(config.ast, None)
             self.type_checker.visit(config.ast, None)
             #semantic errors
-            if print_error_messages:
-                if self.semantic_errors.errors != 0 and not self.compiled_failed:
-                    Colorprints.print_in_yellow(f"***{self.semantic_errors.errors} semantic errors detected***")
-                    self.semantic_errors.print_error_messages()
-                elif self.semantic_errors.errors == 0 and not self.compiled_failed:
+            if print_messages:
+                if self.semantic_messages.errors == 0 and not self.compiled_failed:
                     Colorprints.print_in_green(f"***Congrats! No semantic errors!***")
+                    self.semantic_messages.print_messages()
+
+                elif self.semantic_messages.errors != 0 and not self.compiled_failed:
+                    Colorprints.print_in_yellow(f"***{self.semantic_messages.errors} semantic errors detected***")
+                    self.semantic_messages.print_messages()
 
             #IR generartion and Optimization
-            if self.lexer_errors.errors == 0 and self.parser_errors.errors == 0 and self.semantic_errors.errors == 0:
+            if self.lexer_messages.errors == 0 and self.parser_messages.errors == 0 and self.semantic_messages.errors == 0:
                 self.iR_generator.visit(config.ast, None)
                 
                 self.iR_optimizer.delete_mov_to_same_register()

@@ -1,7 +1,7 @@
 class Tokens(object):
 
-    def __init__(self, lexer_errors):
-        self.lexer_errors = lexer_errors
+    def __init__(self, lexer_messages):
+        self.lexer_messages = lexer_messages
 
     # List of token names.   This is always required
     reserved = {
@@ -106,5 +106,5 @@ class Tokens(object):
 
     # Error handling rule
     def t_error(self, t):
-        self.lexer_errors.add_error({"message":f"Illegal character '{t.value[0]}'","lineno": t.lexer.lineno})
+        self.lexer_messages.add_message({"message":f"Illegal character '{t.value[0]}'","lineno": t.lexer.lineno})
         t.lexer.skip(1)

@@ -1,7 +1,12 @@
 function main() returns Int:
     val Int a;
     a = 10;
+    val Array n;
+    n = createArray(5);
+    n[4 ! 5 >] = 5;
     
+    g(a hi);
+    while(1 < 0) printInt(1);
     -----------syntax error correction
 
     if (a  h>):
@@ -22,4 +27,8 @@ function main() returns Int:
     end
 
     return 0;
+end
+function g(Int i) returns Int:
 
+    return 0;
+end

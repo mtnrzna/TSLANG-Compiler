@@ -2,15 +2,24 @@ function main() returns Int:
     
     val Int n;
     n = getInt();
-    
-    n = fib(n);
-    printInt(n);
+
+    val Array finArr;
+    fibArr = createArray(n); 
+    n = fib(n, fibArr);
+    printArray(fibArr);
     return 0;
 end
 
-function fib(Int n) returns Int:
-
-    if(n < 2) return 1;
-    else
-        return (fib(n-1) + fib (n-2));
+function fib(Int n, Array fibArr) returns Int:
+    if(n < 2):
+        fibArr[0] = 1;
+        fibArr[1] = 1;
+        return 1; 
+    end
+    else:
+        val Int fibn;
+        fibn = (fib(n-1, fibArr) + fib (n-2, fibArr));
+        fibArr[n] = fibn;
+        return fibn;
+    end
 end

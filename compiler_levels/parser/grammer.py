@@ -8,8 +8,8 @@ class Grammar(object):
     tokens = Tokens.tokens
         
 
-    def __init__(self, parser_errors):
-        self.parser_errors = parser_errors
+    def __init__(self, parser_messages):
+        self.parser_messages = parser_messages
 
 
     #  prog rules
@@ -54,7 +54,7 @@ class Grammar(object):
 
     def p_func_error(self, p): # For errors in the paranthesis
         '''func : FUNCTION iden LPARANT error RPARANT RETURNS type COLON body END'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'function iden ( flist ) returns type: body end'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "You should define parameters inside it, like: 'Int a, Array b , ...'","lineno": self.last_message_line, "is_warning":True})
         p[4] = p[4].value
         p[0] = "func"
         p[0] = {
@@ -127,7 +127,7 @@ class Grammar(object):
 
     def p_stmt3_error(self, p): # For errors in the paranthesis
         '''stmt : IF LPARANT error RPARANT stmt else_choice'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'if ( expr ) stmt'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "There must be an expression inside the paranthesis","lineno": self.last_message_line, "is_warning":True})
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
@@ -175,7 +175,7 @@ class Grammar(object):
 
     def p_stmt4_error(self, p): # For errors in the paranthesis
         '''stmt : WHILE LPARANT error RPARANT DO stmt'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'while ( expr ) do stmt'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "There must be an expression inside the paranthesis","lineno": self.last_message_line, "is_warning":True})
         p[3] = p[3].value
         p[0] = "stmt"
         p[0] = {
@@ -188,7 +188,7 @@ class Grammar(object):
 
     def p_stmt4_error2(self, p): # When the programmer forgets to put "do" after left paranthesis
         '''stmt : WHILE LPARANT expr RPARANT error stmt'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'while ( expr ) do stmt'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "There must be 'do' after the ')'","lineno": self.last_message_line, "is_warning":True})
         p[3] = p[5].value
         p[0] = "stmt"
         p[0] = {
@@ -262,7 +262,7 @@ class Grammar(object):
 
     def p_expr1_error(self, p): # For errors in the paranthesis
         '''expr : iden LPARANT error RPARANT'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'iden ( clist )'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "Error Inside the paranthesis,you should put the arguments inside it","lineno": self.last_message_line, "is_warning":True})
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
@@ -285,7 +285,7 @@ class Grammar(object):
 
     def p_expr2_error(self, p): # For errors in the brackets
         '''expr : expr LBRACKET error RBRACKET'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'expr [ expr ]'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "There must be an expression inside the bracket","lineno": self.last_message_line, "is_warning":True})
         p[3] = p[3].value
         p[0] = "expr"
         p[0] = {
@@ -309,7 +309,7 @@ class Grammar(object):
 
     def p_expr3_error(self, p): # For errors when you put "";" instead of ":"
         '''expr : expr QUEST_MARK expr error expr'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is 'expr ? expr : expr'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "The syntax is 'expr ? expr : expr'","lineno": self.last_message_line, "is_warning":True})
         p[4] = p[4].value
         p[0] = "expr"
         p[0] = {
@@ -370,7 +370,7 @@ class Grammar(object):
 
     def p_expr6_error(self, p):
         '''expr : LPARANT error RPARANT'''
-        self.parser_errors.add_error({"message": "!Hint! The syntax is '( expr )'","lineno": self.last_error_line, "is_hint":True}, increment_number=False)
+        self.parser_messages.add_message({"message": "There must be an expression inside the paranthesis","lineno": self.last_message_line, "is_warning":True})
         p[2] = p[2].value
         p[0] = "expr"
         p[0] = {
@@ -530,12 +530,12 @@ class Grammar(object):
     # Error rule for syntax errors
     def p_error(self, p):
         if p:
-            self.parser_errors.add_error({"message": f"Syntax error at token: {p.value}","lineno": self.lexer.lineno})
-            self.last_error_line = self.lexer.lineno
+            self.parser_messages.add_message({"message": f"Syntax error at token: {p.value}","lineno": self.lexer.lineno})
+            self.last_message_line = self.lexer.lineno
             # Just discard the token and tell the parser it's okay.
             #parser.errok()
         else:
-            self.parser_errors.add_error({"message": "Syntax error at EOF", "lineno": self.lexer.lineno})
+            self.parser_messages.add_message({"message": "Syntax error at EOF", "lineno": self.lexer.lineno})
     #Set up precedence
     precedence = (
         ('left', 'error'),

@@ -1,0 +1,9 @@
+function main() returns Int:
+
+    --i is not defined!! but it's ok! 
+    
+    i = getInt();
+    printInt(i);
+
+	return 0;
+end

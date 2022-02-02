@@ -607,7 +607,17 @@ class IRGenerator(NodeVisitor):
     def visit_Expr7(self, node, table):
         #print(f"visiting: expr7")
         name = node.iden.iden_value["name"]
-        iden_reg = table.get(name).reg
+
+        iden_reg = ""
+        # If the variable has "reg" attribute, it means it's initiated before
+        if hasattr(table.get(name), "reg"):
+            iden_reg = table.get(name).reg
+
+        # If the variable dosn't have a "reg" attribute, it means it wasn't defines but due to error correction, It got
+        # added to the table, and since It should be initiated      
+        else:
+            reg = self.initiate_var_symbol_register(name, table)
+            iden_reg = reg
         return {"reg": iden_reg,
         "code" : ""}
         
