@@ -1,4 +1,4 @@
-# TSLAG compiler
+# TSLAG Compiler
 Front end of a compiler for a phony language called *TSLANG*, (The Simple Language), using PLY. ref.: https://www.dabeaz.com/ply/ply.html
 Front end of this compiler contains: lexical analysis, syntax analysis and semantic analysis.
 
